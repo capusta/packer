@@ -1,0 +1,62 @@
+{
+  "builders": [{
+    "boot_command": [
+        "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs>",
+        "/install/vmlinuz noapic ",
+        "file=/floppy/preseed.cfg ",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        "hostname={{.Name}} ",
+        "grub-installer/bootdev=/dev/sda<wait> ",
+        "fb=false debconf/frontend=noninteractive ",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+        "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
+        "passwd/user-fullname=vagrant ",
+        "passwd/user-password=vagrant ",
+        "passwd/user-password-again=vagrant ",
+        "passwd/username=vagrant ",
+        "initrd=/install/initrd.gz quiet --- <enter>"
+    ],
+      "boot_wait": "10s",
+    "disk_size": 40960,
+    "floppy_files": [
+      "http/preseed.cfg"
+    ],      
+    "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+    "guest_os_type": "Ubuntu_64",
+    "headless": false,
+    "hard_drive_interface": "sata",
+    "iso_checksum": "70db69379816b91eb01559212ae474a36ecec9ef",
+    "iso_checksum_type": "sha1",
+      "iso_urls": ["/Users/jani/ubuntu-16.04-server-amd64.iso",
+                   "http://releases.ubuntu.com/16.04/ubuntu-16.04-server-amd64.iso"],
+    "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+    "ssh_password": "vagrant",
+    "ssh_port": 22,
+    "ssh_username": "vagrant",
+    "ssh_wait_timeout": "10000s",
+    "type": "virtualbox-iso",
+    "vboxmanage": [
+      ["modifyvm", "{{.Name}}", "--memory", "1024"],
+      ["modifyvm", "{{.Name}}", "--cpus", "1"]
+    ],
+    "virtualbox_version_file": ".vbox_version"
+  }],
+  "post-processors": [{
+    "output": "build/ubuntu-16.04-amd64.box",
+    "type": "vagrant"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+    "scripts": [
+      "scripts/vagrant.sh",
+      "scripts/vboxguest.sh",
+      "scripts/compact.sh"
+    ]
+  }]
+}
