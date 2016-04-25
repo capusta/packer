@@ -1,4 +1,10 @@
 {
+    "variables": {
+        "vm_name": "u1604lxde",
+        "ssh_username": "vagrant",
+        "password": "vagrant"
+    },
+
   "builders": [{
     "boot_command": [
         "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
@@ -9,8 +15,9 @@
         "<bs><bs><bs><bs>",
         "/install/vmlinuz noapic ",
         "file=/floppy/preseed.cfg ",
+        "vga=788 ",
         "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
-        "hostname={{.Name}} ",
+        "hostname={{user `vm_name`}} ",
         "grub-installer/bootdev=/dev/sda<wait> ",
         "fb=false debconf/frontend=noninteractive ",
         "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
@@ -25,7 +32,7 @@
     "disk_size": 40960,
     "floppy_files": [
       "http/preseed.cfg"
-    ],      
+    ],
     "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
     "guest_os_type": "Ubuntu_64",
     "headless": false,
@@ -42,21 +49,28 @@
     "type": "virtualbox-iso",
     "vboxmanage": [
       ["modifyvm", "{{.Name}}", "--memory", "1024"],
-      ["modifyvm", "{{.Name}}", "--cpus", "1"]
+      ["modifyvm", "{{.Name}}", "--cpus", "1"],
+      ["modifyvm", "{{.Name}}", "--vram", "16"]
     ],
-    "virtualbox_version_file": ".vbox_version"
+      "virtualbox_version_file": ".vbox_version",
+      "vm_name": "{{user `vm_name`}}"
   }],
   "post-processors": [{
-    "output": "build/ubuntu-16.04-amd64.box",
+    "output": "build/ubuntu-1604-lxde-desktop.box",
     "type": "vagrant"
   }],
-  "provisioners": [{
-    "type": "shell",
-    "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
-    "scripts": [
-      "scripts/vagrant.sh",
-      "scripts/vboxguest.sh",
-      "scripts/compact.sh"
+    "provisioners": [
+        {
+            "environment_vars": [
+                "SSH_USERNAME={{user `ssh_username`}}"
+            ],
+            "type": "shell",
+            "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+            "scripts": [
+                "scripts/vagrant.sh",
+                "scripts/vboxguest.sh",
+                "scripts/compact.sh"
+            ]
+        }
     ]
-  }]
 }
