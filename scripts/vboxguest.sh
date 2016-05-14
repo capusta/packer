@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+echo "==> VirtualBox Guest Additions"
 mkdir /tmp/virtualbox
 VERSION=$(cat /home/vagrant/.vbox_version)
 mount -o loop /home/vagrant/VBoxGuestAdditions_$VERSION.iso /tmp/virtualbox
