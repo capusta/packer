@@ -33,4 +33,16 @@ if [[ -z ${HOSTNAME+x} ]]; then
 fi
 log "Building: ${HOSTNAME}"
 
+# Shared Vars setup ... for customization
+SHARED_VARS=''
+# Packer will dump the final product here
+output_directory="vm_out"
+test -e ${output_directory}
+
+SHARED_vars="${SHARED_VARS}
+                -var output_directory=${output_directory}
+                -var hostname=${HOSTNAME}"
+
+packer validate ${SHARED_VARS} ubuntu.json
+packer build -force ${SHARED_VARS} ubuntu.json
 
