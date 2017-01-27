@@ -1,12 +1,21 @@
 #! /usr/bin/env bash
 set -eu
 
+
+##Parse long and short OPTIONS
+OPTIONS=$(getopt -o hn: -l name:,os:,help -- "$@")
+
+if [ $? != 0 ]; then
+    echo "Failed to parse arguments."
+    exit 1
+fi
+
 # Call yourself with -h if no arguments
 [[ -z $@ ]] && ./$0 -h && exit 1
 
-while [[ $# -ge 1 ]]; do
-    key="$1"
-    case $key in
+eval set -- "$OPTIONS"
+while true; do
+    case "$1" in
         -h|--help)
             echo -e "
             Usage:
@@ -16,10 +25,21 @@ while [[ $# -ge 1 ]]; do
             "
             exit
         ;;
-    -n|--name)
-        HOSTNAME=$2
-        shift; shift;
+        -n|--name)
+            HOSTNAME=$2
+            shift; shift;
         ;;
+        --os)
+	    echo "$1 Can't do this function yet"
+	    exit 1
+	;;
+        --)
+	    shift
+	    break
+	;;
+        *)
+	    echo "Invalid option"
+	;;    
     esac
 done
 
