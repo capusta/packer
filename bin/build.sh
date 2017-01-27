@@ -11,7 +11,7 @@ if [ $? != 0 ]; then
 fi
 
 # Call yourself with -h if no arguments
-[[ -z $@ ]] && ./$0 -h && exit 1
+[[ -z $@ ]] && $0 -h && exit 1
 
 eval set -- "$OPTIONS"
 while true; do
@@ -53,16 +53,16 @@ if [[ -z ${HOSTNAME+x} ]]; then
 fi
 log "Building: ${HOSTNAME}"
 
-# Shared Vars setup ... for customization
-SHARED_VARS=''
 # Packer will dump the final product here
 output_directory="vm_out"
 test -e ${output_directory}
 
-SHARED_vars="${SHARED_VARS}
-                -var output_directory=${output_directory}
-                -var hostname=${HOSTNAME}"
+SHARED_VARS=""
+SHARED_VARS="${SHARED_VARS} \
+    -var output_directory=${output_directory} \
+    -var hostname=${HOSTNAME} \
+    "
 
-packer validate ${SHARED_VARS} ubuntu.json
-packer build -force ${SHARED_VARS} ubuntu.json
+packer validate "${SHARED_VARS}" ubuntu.json
+packer build -force "${SHARED_VARS}" ubuntu.json
 

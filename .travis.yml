@@ -7,4 +7,4 @@ addons:
     - shellcheck
 
 script:
-  - 'shellcheck -x bin/build.sh'
+  - 'test/shellcheck.sh'
