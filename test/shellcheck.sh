@@ -2,7 +2,7 @@
 set -x
 case "$(lsb_release -c | cut -f 2)" in
     xenial|trusty|precise)
-        switch=$(dpkg -s shellcheck | grep -i version | cut -f 2 -d ' ' | grep '0.4' && echo '-x')
+        switch=$(dpkg -s shellcheck | grep -q "^0.4" && echo '-x')
         bash -c "shellcheck ${switch} bin/build.sh"
         ;;
     CentOS)
