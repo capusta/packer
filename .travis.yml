@@ -8,3 +8,4 @@ addons:
 
 script:
   - 'shellcheck -x bin/build.sh'
+  - 'shellcheck --version'
