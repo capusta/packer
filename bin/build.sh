@@ -1,9 +1,8 @@
 #! /usr/bin/env bash
 set -eu
 
-
 ##Parse long and short OPTIONS
-OPTIONS=$(getopt -o hn: -l name:,os:,help -- "$@")
+OPTIONS=$(getopt -o hn: -l name:,os:,download:,help -- "$@")
 
 if [ $? != 0 ]; then
     echo "Failed to parse arguments."
@@ -22,36 +21,47 @@ while true; do
             -h|--help \t\t Bring up this menu
             -n|--name \t\t Hostname
             --os (centos|ubuntu) \t Type of OS
+            --download \t Downloads the ISOs from internetz
             "
             exit
-        ;;
+            ;;
         -n|--name)
-            HOSTNAME=$2
+            HOST=$2
             shift; shift;
-        ;;
+            ;;
         --os)
-	    echo "$1 Can't do this function yet"
-	    exit 1
-	;;
+            OS=$2
+            shift; shift
+            ;;
+        --download)
+            DOWNLOAD=$2
+            shift; shift;
+            ;;
         --)
-	    shift
-	    break
-	;;
-        *)
-	    echo "Invalid option"
-	;;
+            shift;
+            break
+            ;;
     esac
 done
 
-# Going to assume that no one is going to be running
-# anything directly out of this folder
+if [[ ! -z ${DOWNLOAD:-} ]]; then
+    bin/download.sh --os "${DOWNLOAD}"
+    exit 0
+fi
+
+# Load good common libraries ... like logging, etc
 source bin/common.sh
 
 # Sanity check
-if [[ -z ${HOSTNAME+x} ]]; then
+if [[ -z ${HOST:-} ]]; then
     graceful_exit "Hostname not defined"
 fi
-log "Building: ${HOSTNAME}"
+
+if [[ -z ${OS:-} ]]; then
+    graceful_exit "Operating System not defined"
+fi
+
+log "Building: ${OS} ${HOST}"
 
 # Packer will dump the final product here
 output_directory="vm_out"
@@ -60,7 +70,7 @@ test -e ${output_directory}
 SHARED_VARS=""
 SHARED_VARS="${SHARED_VARS} \
     -var output_directory=${output_directory} \
-    -var hostname=${HOSTNAME} \
+    -var hostname=${HOST} \
     "
 
 packer validate "${SHARED_VARS}" ubuntu.json
