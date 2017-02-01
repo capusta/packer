@@ -3,14 +3,13 @@ set -eu
 
 # Downloads ISO from internetz
 OPTIONS=$(getopt -o hn: -l os:,codename:,help: -- "$@")
+source bin/common.sh
+
 if [ $? != 0 ]; then
-    echo 'Failed to parse arguments'
-    exit 1
+    graceful_exit 'Failed to parse arguments'
 fi
 #Call yourself with -h if no arguments
 [[ -z $@ ]] && $0 -h && exit 1
-
-source bin/common.sh
 
 set +x
 
@@ -41,7 +40,7 @@ while true; do
             shift; shift;
             ;;
 		--codename)
-			log "Not implemented, but will be (trusty|xenial|7.2)"
+			log "Codename Not implemented, but will be (trusty|xenial|7.2)"
 			shift;
 			;;
 		--)
@@ -57,3 +56,4 @@ if [[ -z ${OS+x} ]]; then
 fi
 
 log "Downloading ${OS}"
+wget -N -P iso --progress=bar "${OS}"

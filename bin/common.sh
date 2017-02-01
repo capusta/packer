@@ -16,13 +16,6 @@ function set_log(){
     export LOG_FILE
 }
 
-function graceful_exit(){
-    [[ -z $@ ]] && exit 0
-    echo "$1"
-    logger -t "${LOG_USER}" "ERROR: $1"
-    exit 1
-}
-
 function log(){
     # TODO: make color changes based on first argument
 
@@ -43,6 +36,13 @@ function log(){
         logger -t "${LOG_USER}" "$1:" "$2"
     fi
 }
+
+function graceful_exit(){
+    [[ -z $@ ]] && exit 0
+    log "ERROR" "$1"
+    exit 1
+}
+
 
 if [[ $(find iso -name "*.iso" | wc -l) == 0 ]]; then
     log "WARNING" "No ISOs found for some reason"
