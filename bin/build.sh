@@ -50,7 +50,7 @@ if [[ ! -z ${DOWNLOAD:-} ]]; then
 fi
 
 # Load good common libraries ... like logging, etc
-source bin/common.sh
+source bin/common.sh || true
 
 # Sanity check
 if [[ -z ${HOST:-} ]]; then
@@ -61,18 +61,21 @@ if [[ -z ${OS:-} ]]; then
     graceful_exit "Operating System not defined"
 fi
 
-log "Building: ${OS} ${HOST}"
+set_log "logs/${HOST}-${OS}.log"
+log "INFO" "Building: ${OS} ${HOST}"
 
 # Packer will dump the final product here
 output_directory="vm_out"
 test -e ${output_directory}
 
-SHARED_VARS=""
-SHARED_VARS="${SHARED_VARS} \
-    -var output_directory=${output_directory} \
-    -var hostname=${HOST} \
-    "
+SHARED_VARS="-var hostname=${HOST}"
+SHARED_VARS="${SHARED_VARS} -var output_directory=${output_directory}"
 
-packer validate "${SHARED_VARS}" ubuntu.json
-packer build -force "${SHARED_VARS}" ubuntu.json
+log "Validating ${SHARED_VARS}"
+packer validate $SHARED_VARS ubuntu.json
+
+log "Settings validated: ${SHARED_VARS}"
+log "Starting building ${OS} ${HOST}"
+
+packer build -force $SHARED_VARS ubuntu.json >> "${LOG_FILE}"
 

@@ -3,7 +3,7 @@
   {
   "type": "virtualbox-iso",
   "guest_os_type": "Ubuntu_64",
-  "guest_additions_mode":"disabled",
+  "guest_additions_mode":"disable",
   "iso_url": "iso/ubuntu-14.04.4-server-amd64.iso",
   "iso_checksum": "2ac1f3e0de626e54d05065d6f549fa3a",
   "iso_checksum_type": "md5",
