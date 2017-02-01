@@ -72,10 +72,10 @@ SHARED_VARS="-var hostname=${HOST}"
 SHARED_VARS="${SHARED_VARS} -var output_directory=${output_directory}"
 
 log "Validating ${SHARED_VARS}"
-packer validate $SHARED_VARS ubuntu.json
+bash -c "packer validate $SHARED_VARS ubuntu.json"
 
 log "Settings validated: ${SHARED_VARS}"
 log "Starting building ${OS} ${HOST}"
 
-packer build -force $SHARED_VARS ubuntu.json >> "${LOG_FILE}"
+bash -c "packer build -force $SHARED_VARS ubuntu.json >> \"${LOG_FILE}\""
 
