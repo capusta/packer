@@ -21,6 +21,9 @@ Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
     vb.gui = true
+
+    # Customize the amount of memory on the VM:
+    vb.memory = "1024"
   end
 end
 $ vagrant up
@@ -32,14 +35,14 @@ Default user/password  is `vagrant/vagrant` with passwordless sudo.
 
 The box defaults to 1GB RAM, US locale, US keyboard layout and UTC timezone. You might want to change those:
 
-* change RAM: TODO
+* change RAM: edit `vb.memory` value in the Vagrantfile
 * change keyboard layout: http://askubuntu.com/a/237057/18928
-* change timezone: TODO 
+* change timezone: https://help.ubuntu.com/community/UbuntuTime
 
 How the box was made
 --------------------
 
-Install VirtualBox, Vagrant and [Packer](https://www.packer.io/downloads.html).
+Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads), [Vagrant](https://www.vagrantup.com/downloads.html) and [Packer](https://www.packer.io/downloads.html).
 
 Run `packer`:
 

@@ -1,7 +1,7 @@
 {
     "variables": {
-        "iso_checksum": "70db69379816b91eb01559212ae474a36ecec9ef",
-        "iso_name": "ubuntu-16.04-server-amd64.iso",
+        "iso_checksum": "737ae7041212c628de5751d15c3016058b0e833fdc32e7420209b76ca3d0a535",
+        "iso_name": "ubuntu-16.04.2-server-amd64.iso",
         "ssh_password": "vagrant",
         "ssh_username": "vagrant",
         "vm_name": "u1604lxde"
@@ -39,9 +39,10 @@
         "headless": false,
         "hard_drive_interface": "sata",
         "iso_checksum": "{{user `iso_checksum`}}",
-        "iso_checksum_type": "sha1",
+        "iso_checksum_type": "sha256",
         "iso_urls": ["{{user `iso_name`}}",
                      "http://releases.ubuntu.com/16.04/{{user `iso_name`}}"],
+        "post_shutdown_delay": "30s",
         "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
         "ssh_password": "{{user `ssh_password`}}",
         "ssh_port": 22,
