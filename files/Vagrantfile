@@ -1,0 +1,34 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Network configuration
+  config.vm.provider "virtualbox" do |vbox|
+    vbox.memory = 2
+    vbox.cpus = 2
+  end
+
+  #config.vm.network "private_network", ip: "dhcp"
+  config.vm.hostname = "devbox"
+
+  # Shared configuration
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder ".", "/ansible"
+
+  $script = <<SCRIPT
+  echo "install ansible"
+SCRIPT
+
+  config.vm.provision "shell", inline: $script
+
+  # Provisioning
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.playbook = "kickstart.yml"
+    ansible.install = true
+    ansible.provisioning_path = "/ansible/ansible"
+    ansible.inventory_path = "hosts"
+    ansible.limit = "all"
+    ansible.verbose = true
+    ansible.raw_arguments = "-c local"
+  end
+end
