@@ -1,9 +1,9 @@
 #! /usr/bin/env bash
 set -eu
 
-# TODO: check a specific version
 git --version     > /dev/null
 ansible --version > /dev/null
+vagrant --version > /dev/null
 vboxmanage -v     > /dev/null
 packer version    > /dev/null
 
