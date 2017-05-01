@@ -9,7 +9,6 @@ import platform
 """
     Generates a virtualbox image
 """
-
 if len(sys.argv) == 1:
     print "Please use -h for usage"
     print "Using defaults: --hostname devbox --codename trusty"
@@ -77,13 +76,19 @@ except:
 SHARED_VARS={'hostname': args['hostname'][0]}
 SHARED_VARS['iso_checksum'] = md5sum
 
+# We might have packer hiding in our local bin directory
+ADD_PATH = os.getcwd()+'/bin'
+log("Adding %s to path" % ADD_PATH)
+MY_ENV = os.environ.copy()
+MY_ENV["PATH"] = ADD_PATH + MY_ENV["PATH"]
+
 # Generating var file in json format - consumed by packer
 import json
 with open('http/ubuntu.vars', 'w') as outfile:
     json.dump(SHARED_VARS, outfile)
 
 log("Validating ubuntu template")
-p = subprocess.Popen(['packer','validate','-var-file=http/ubuntu.vars','http/'+args['codename']+'.json'])
+p = subprocess.Popen(['packer','validate','-var-file=http/ubuntu.vars','http/'+args['codename']+'.json'], env=MY_ENV, shell=True)
 p.communicate()[0]
 log("Validation of template return: %d" % p.returncode)
 

@@ -2,3 +2,4 @@
 packer_cache
 bin/packer
 output-virtualbox-iso/
+http/ubuntu.vars
