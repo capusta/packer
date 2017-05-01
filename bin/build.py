@@ -48,11 +48,11 @@ import subprocess
 log("Using hostname %s" % args['hostname'][0])
 
 if args['codename'] == 'trusty':
-    dwBase='http://releases.ubuntu.com/14.04/'
-    dwURL = 'ubuntu-14.04.5-server-amd64.iso'
+    DWBASE = 'http://releases.ubuntu.com/14.04'
+    DWURL = 'ubuntu-14.04.5-server-amd64.iso'
 else:
-    dwBase = 'http://releases.ubuntu.com/16.04/'
-    dwURL = 'ubuntu-16.04.2-server-amd64.iso'
+    DWBASE = 'http://releases.ubuntu.com/16.04'
+    DWURL = 'ubuntu-16.04.2-server-amd64.iso'
 
 if args['download'] == None:
     log("Downloading Image")
@@ -62,7 +62,7 @@ if args['download'] == None:
         log("Cannot find wget - make sure to install wget 'brew install wget' if this is a mac")
         exit()
     # TODO: account for other operating systems
-    p = subprocess.Popen(['wget','-v','-N','-P','iso','--progress=bar',dwBase+dwURL])
+    p = subprocess.Popen(['wget','-v','-N','-P','iso','--progress=bar',DWBASE+"/"+DWURL])
     p = subprocess.Popen([md5command,'iso/'+dwURL])
     print p.communicate()[1]
 try:
@@ -94,5 +94,6 @@ log("Validation of template return: %d" % p.returncode)
 
 # The actual build of devbox
 log("Starting Packer build")
+sys.exit(1)
 p = subprocess.Popen(['packer','build','-force','-on-error=abort',
                       '-var-file=http/ubuntu.vars','http/'+args['codename']+'.json'])
