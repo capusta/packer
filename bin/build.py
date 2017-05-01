@@ -30,10 +30,12 @@ md5sum=''
 myOS=''
 if (os.name == 'posix' and platform.system() == 'Darwin'):
     # Set up any mac variables here
+    log("System is mac")
     myOS       = 'mac'
     md5command = 'md5'
 else:
     # Set up Linux? variables here
+    log("System is Ubuntu")
     myOS       = 'Debian'
     md5command = 'md5sum'
 
@@ -64,12 +66,13 @@ if args['download'] == None:
     p = subprocess.Popen(['wget','-v','-N','-P','iso','--progress=bar',dwBase+dwURL])
     p = subprocess.Popen([md5command,'iso/'+dwURL])
     print p.communicate()[1]
-
 try:
     log('Checking md5sum for %s' % dwURL)
-    md5sum = subprocess.check_output([md5command,'iso/'+dwURL]).split('=')[1].strip()
+    if myOS == 'Debian':
+        md5sum = subprocess.check_output([md5command,'iso/'+dwURL]).split(' ')[0].strip()
 except:
     log("Unable to do md5 on the iso file, is it downloaded?")
+    sys.exit(1)
 
 SHARED_VARS={'hostname': args['hostname'][0]}
 SHARED_VARS['iso_checksum'] = md5sum

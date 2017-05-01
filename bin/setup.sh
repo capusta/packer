@@ -4,6 +4,7 @@ grep -qi ubuntu /etc/issue && export OS=ubuntu || echo 'not ubuntu'
 
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`
+YELLOW=`tput setaf 3`
 NC=`tput sgr0`
 
 function out_ok {
@@ -16,6 +17,16 @@ function out_err {
     return
 }
 
+function out_warn {
+    echo "${YELLOW}$1${NC}"
+    return
+}
+function install_packer {
+    out_warn "Installing packer"
+    wget -c -v https://releases.hashicorp.com/packer/1.0.0/packer_1.0.0_linux_amd64.zip
+    unzip packer_1.0.0_linux_amd64.zip
+    rm packer_1.0.0_linux_amd64.zip
+}
 case "${OS}" in
     ubuntu)
         echo "OS is ubuntu"
@@ -25,6 +36,10 @@ case "${OS}" in
         which vagrant || sudo apt-get -y install vagrant && out_ok "-->OK"
         out_ok "Checking virtualbox"
         which vboxmanage || sudo apt-get -y install virtualbox && out_ok "-->OK"
+        out_warn "Checking packer"
+        bin/packer -version || install_packer && out_ok "-->OK"
+        out_warn "Checking ansible"
+        ansible -version || sudo apt-get -y install ansible && out_ok "-->OK"
         ;;
     *)
         echo "Unknown OS"
