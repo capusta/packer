@@ -1,8 +1,21 @@
-*.tmp
-packer_cache
-bin/packer
+# Folder stuff
+.idea/
+packer_cache/
 output-virtualbox-iso/
+
+# Specifically Ignored for the build process
 http/ubuntu.vars
+
+# Random Binaries
+bin/packer
+
+# Random files
+*.swp
+*.tmp
+*.log
 
 # Python Stuff
 *.pyc
+
+# OSX Stuff
+wget-log
