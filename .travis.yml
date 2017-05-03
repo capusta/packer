@@ -1,10 +1,6 @@
-language: bash
-addons:
-  apt:
-    sources:
-    - debian-sid
-    packages:
-    - shellcheck
-
+language: python
+python:
+    - "2.7"
+cache: pip
 script:
-  - 'test/shellcheck.sh'
+    - python -m py_compile bin/build.py
