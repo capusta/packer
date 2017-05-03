@@ -1,4 +1,7 @@
 #! /usr/bin/env python
+"""
+    Generates a virtualbox image
+"""
 import argparse
 from logging.handlers import RotatingFileHandler
 import logging
@@ -7,22 +10,21 @@ import time
 import os
 import platform
 import json
-"""
-    Generates a virtualbox image
-"""
+import subprocess
+
 if len(sys.argv) == 1:
     print "Please use -h for usage"
     print "Using defaults: --hostname devbox --codename trusty"
     time.sleep(2)
 
-logger = logging.getLogger("Rotating Log")
-logger.setLevel(logging.INFO)
-handler = RotatingFileHandler('logs/build.log',maxBytes=10*1024,backupCount=5)
-logger.addHandler(handler)
+LOGGER = logging.getLogger("Rotating Log")
+LOGGER.setLevel(logging.INFO)
+HANDLER = RotatingFileHandler('logs/build.log', maxBytes=10*1024, backupCount=5)
+LOGGER.addHandler(HANDLER)
 
-def log(s):
-    print(time.strftime("%y-%m-%d:%H-%M: ")+ s)
-    logger.info(time.strftime("%y-%m-%d:%H-%M: ")+ s)
+def log(MSG):
+    print time.strftime("%y-%m-%d:%H-%M: ") + MSG
+    LOGGER.info(time.strftime("%y-%m-%d:%H-%M: ")+ MSG)
 
 ## some global variables to help with ubuntu devs
 md5command=''
@@ -36,7 +38,7 @@ if (os.name == 'posix' and platform.system() == 'Darwin'):
 else:
     # Set up Linux? variables here
     log("System is Ubuntu")
-    myOS       = 'Debian'
+    myOS = 'Debian'
     md5command = 'md5sum'
 
 parser = argparse.ArgumentParser()
@@ -45,11 +47,10 @@ parser.add_argument("--download", nargs='?', help='Download the ISO From Ubuntu'
 parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='trusty')
 args = vars(parser.parse_args());
 
-import subprocess
 log("Using hostname %s" % args['hostname'][0])
 
 # NO case in python :(
-CODENAME=args['codename']
+CODENAME = args['codename']
 if CODENAME == 'trusty32':
     DWBASE = 'http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot'
     DWFILE = 'mini.iso'
@@ -69,17 +70,19 @@ else:
     DWFILE = 'ubuntu-16.04.2-server-amd64.iso'
     CODENAME = 'xenial'
 
-if args['download'] == None:
-    log("Downloading Image")
-    p2 = subprocess.Popen(['which','wget'])
-    p2.communicate()[0]
-    if p2.returncode == 1:
+if args['download'] is None:
+    log("Downloading %s" % DWBASE + DWFILE)
+    P2 = subprocess.Popen(['which', 'wget'])
+    P2.communicate()[0]
+    if P2.returncode == 1:
         log("Cannot find wget - make sure to install wget 'brew install wget' if this is a mac")
         exit()
     # TODO: account for other operating systems
     P = subprocess.Popen(['wget', '-v', '-N', '-P', 'iso', '--progress=bar', DWBASE+"/"+DWFILE])
     P = subprocess.Popen([md5command, 'iso/'+DWFILE])
     print P.communicate()[1]
+
+log('Checking md5sum for %s' % DWFILE)
 try:
     log('Checking md5sum for %s' % DWFILE)
     if myOS == 'Debian':
@@ -93,6 +96,7 @@ except:
 SHARED_VARS = {'hostname': args['hostname'][0]} # Hostname is different all the time
 SHARED_VARS['iso_checksum'] = MD5SUM            # Dynamic checksum so packer doesnt freak out
 SHARED_VARS['iso_file'] = DWFILE                # We might be using different ISO files
+SHARED_VARS['iso_checksum_type'] = 'md5'
 
 # We might have packer hiding in our local bin directory
 ADD_PATH = os.getcwd()+'/bin:'
