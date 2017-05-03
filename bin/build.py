@@ -6,6 +6,7 @@ import sys
 import time
 import os
 import platform
+import json
 """
     Generates a virtualbox image
 """
@@ -47,12 +48,26 @@ args = vars(parser.parse_args());
 import subprocess
 log("Using hostname %s" % args['hostname'][0])
 
-if args['codename'] == 'trusty':
+# NO case in python :(
+CODENAME=args['codename']
+if CODENAME == 'trusty32':
+    DWBASE = 'http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot'
+    DWFILE = 'mini.iso'
+    # Our teimplates in ./http dir use the codename without the arch
+    CODENAME = 'trusty'
+elif 'trusty' in CODENAME:
+    # Default case for trusty
     DWBASE = 'http://releases.ubuntu.com/14.04'
-    DWURL = 'ubuntu-14.04.5-server-amd64.iso'
+    DWFILE = 'ubuntu-14.04.5-server-amd64.iso'
+    CODENAME = 'trusty'
+elif CODENAME == 'xenial32':
+    DWBASE = 'http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot'
+    DWFILE = 'mini.iso'
+    CODENAME = 'xenial'
 else:
     DWBASE = 'http://releases.ubuntu.com/16.04'
-    DWURL = 'ubuntu-16.04.2-server-amd64.iso'
+    DWFILE = 'ubuntu-16.04.2-server-amd64.iso'
+    CODENAME = 'xenial'
 
 if args['download'] == None:
     log("Downloading Image")
@@ -62,28 +77,30 @@ if args['download'] == None:
         log("Cannot find wget - make sure to install wget 'brew install wget' if this is a mac")
         exit()
     # TODO: account for other operating systems
-    p = subprocess.Popen(['wget','-v','-N','-P','iso','--progress=bar',DWBASE+"/"+DWURL])
-    p = subprocess.Popen([md5command,'iso/'+dwURL])
-    print p.communicate()[1]
+    P = subprocess.Popen(['wget', '-v', '-N', '-P', 'iso', '--progress=bar', DWBASE+"/"+DWFILE])
+    P = subprocess.Popen([md5command, 'iso/'+DWFILE])
+    print P.communicate()[1]
 try:
-    log('Checking md5sum for %s' % dwURL)
+    log('Checking md5sum for %s' % DWFILE)
     if myOS == 'Debian':
-        md5sum = subprocess.check_output([md5command,'iso/'+dwURL]).split(' ')[0].strip()
+        log("System is Debian, using %s command" % md5command)
+        MD5SUM = subprocess.check_output([md5command, 'iso/'+DWFILE]).split(' ')[0].strip()
 except:
-    log("Unable to do md5 on the iso file, is it downloaded?")
+    log("Unable to do md5 on the iso file %s, is it downloaded?" % DWFILE)
     sys.exit(1)
 
-SHARED_VARS={'hostname': args['hostname'][0]}
-SHARED_VARS['iso_checksum'] = md5sum
+# JSON variable file is generated dynamically before packer validation
+SHARED_VARS = {'hostname': args['hostname'][0]} # Hostname is different all the time
+SHARED_VARS['iso_checksum'] = MD5SUM            # Dynamic checksum so packer doesnt freak out
+SHARED_VARS['iso_file'] = DWFILE                # We might be using different ISO files
 
 # We might have packer hiding in our local bin directory
-ADD_PATH = os.getcwd()+'/bin'
+ADD_PATH = os.getcwd()+'/bin:'
 log("Adding %s to path" % ADD_PATH)
 MY_ENV = os.environ.copy()
 MY_ENV["PATH"] = ADD_PATH + MY_ENV["PATH"]
 
 # Generating var file in json format - consumed by packer
-import json
 with open('http/ubuntu.vars', 'w') as outfile:
     json.dump(SHARED_VARS, outfile)
 
