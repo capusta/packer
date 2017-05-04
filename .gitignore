@@ -18,4 +18,6 @@ bin/packer
 *.pyc
 
 # OSX Stuff
+.DS_Store
 wget-log
+wget-log.*

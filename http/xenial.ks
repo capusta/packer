@@ -7,7 +7,9 @@ d-i grub-installer/only_debian boolean true
 d-i grub-installer/with_other_os boolean true
 d-i partman-auto-lvm/guided_size string max
 d-i partman-auto/choose_recipe select atomic
-d-i partman-auto/method string lvm
+d-i partman-auto/method string regular
+# Ubuntu 15.04 (vivid) doesn't support lvm yet:
+#d-i partman-auto/method string lvm
 d-i partman-lvm/confirm boolean true
 d-i partman-lvm/confirm boolean true
 d-i partman-lvm/confirm_nooverwrite boolean true
@@ -22,10 +24,13 @@ d-i passwd/user-password password vagrant
 d-i passwd/user-password-again password vagrant
 d-i passwd/username string vagrant
 d-i pkgsel/include string openssh-server cryptsetup build-essential libssl-dev libreadline-dev zlib1g-dev linux-source dkms nfs-common linux-headers-$(uname -r) perl
+d-i user-setup/allow-password-weak boolean true
+d-i user-setup/encrypt-home boolean false
 d-i pkgsel/install-language-support boolean false
+# Policy for applying updates.  May be "none" (no automatic updates),
+# "unattended-upgrades" (install security updates automatically), or
+# "landscape" (manage system with Landscape).
 d-i pkgsel/update-policy select none
 d-i pkgsel/upgrade select full-upgrade
 d-i time/zone string UTC
-d-i user-setup/allow-password-weak boolean true
-d-i user-setup/encrypt-home boolean false
-tasksel tasksel/first multiselect standard, server
+tasksel tasksel/first multiselect standard, ubuntu-server
