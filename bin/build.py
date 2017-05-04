@@ -63,7 +63,9 @@ elif 'trusty' in CODENAME:
     CODENAME = 'trusty'
 elif CODENAME == 'xenial32':
     DWBASE = 'http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot'
+    DWBASE = 'http://cdimage.ubuntu.com/lubuntu/releases/17.04/release'
     DWFILE = 'mini.iso'
+    DWFILE = 'lubuntu-17.04-desktop-i386.iso'
     CODENAME = 'xenial'
 else:
     DWBASE = 'http://releases.ubuntu.com/16.04'
@@ -84,10 +86,13 @@ if args['download'] is None:
 
 log('Checking md5sum for %s' % DWFILE)
 try:
-    log('Checking md5sum for %s' % DWFILE)
+    MD5SUM = subprocess.check_output([md5command, 'iso/'+DWFILE])
+    log("Tentative MD5 Sum: %s" % MD5SUM)
     if myOS == 'Debian':
-        log("System is Debian, using %s command" % md5command)
-        MD5SUM = subprocess.check_output([md5command, 'iso/'+DWFILE]).split(' ')[0].strip()
+        print "Not implemented yet"
+        #TODO: Add support to extract checksum
+    if myOS == 'mac':
+        MD5SUM = MD5SUM.split("=")[1].strip()
 except:
     log("Unable to do md5 on the iso file %s, is it downloaded?" % DWFILE)
     sys.exit(1)
@@ -108,13 +113,19 @@ MY_ENV["PATH"] = ADD_PATH + MY_ENV["PATH"]
 with open('http/ubuntu.vars', 'w') as outfile:
     json.dump(SHARED_VARS, outfile)
 
-log("Validating ubuntu template")
-p = subprocess.Popen(['packer','validate','-var-file=http/ubuntu.vars','http/'+args['codename']+'.json'], env=MY_ENV, shell=True)
-p.communicate()[0]
-log("Validation of template return: %d" % p.returncode)
+PACKER_TEMPLATE = 'http/'+CODENAME.strip()+'.json'
+MYPACKER = subprocess.check_output(['which', 'packer']).strip()
+log("Validating %s with %s " % (PACKER_TEMPLATE, MYPACKER))
+
+P = subprocess.Popen(['packer', 'validate', '-var-file=http/ubuntu.vars', PACKER_TEMPLATE], stdout=subprocess.PIPE)
+P.communicate()
+if P.returncode == 1:
+    log("%s validation error.  Exit %d" % (PACKER_TEMPLATE, P.returncode))
+    sys.exit(P.returncode)
+else:
+    log("Validation of %s return: %d" % (PACKER_TEMPLATE, P.returncode))
 
 # The actual build of devbox
 log("Starting Packer build")
-sys.exit(1)
-p = subprocess.Popen(['packer','build','-force','-on-error=abort',
-                      '-var-file=http/ubuntu.vars','http/'+args['codename']+'.json'])
+P = subprocess.Popen(['packer', 'build', '-force', '-on-error=abort',
+                      '-var-file=http/ubuntu.vars', PACKER_TEMPLATE])

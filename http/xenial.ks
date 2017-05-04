@@ -18,14 +18,10 @@ d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 d-i partman/confirm_nooverwrite boolean true
 d-i partman/confirm_write_new_label boolean true
-d-i passwd/user-fullname string vagrant
-d-i passwd/user-uid string 1000
-d-i passwd/user-password password vagrant
-d-i passwd/user-password-again password vagrant
-d-i passwd/username string vagrant
-d-i pkgsel/include string openssh-server cryptsetup build-essential libssl-dev libreadline-dev zlib1g-dev linux-source dkms nfs-common linux-headers-$(uname -r) perl
 d-i user-setup/allow-password-weak boolean true
 d-i user-setup/encrypt-home boolean false
+#d-i pkgsel/include string openssh-server cryptsetup build-essential libssl-dev libreadline-dev zlib1g-dev linux-source dkms
+d-i pkgsel/include string openssh-server ntp curl nfs-common linux-headers-$(uname -r) build-essential perl dkms lubuntu-desktop
 d-i pkgsel/install-language-support boolean false
 # Policy for applying updates.  May be "none" (no automatic updates),
 # "unattended-upgrades" (install security updates automatically), or
