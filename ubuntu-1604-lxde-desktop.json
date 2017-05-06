@@ -1,0 +1,79 @@
+{
+    "variables": {
+        "iso_checksum": "737ae7041212c628de5751d15c3016058b0e833fdc32e7420209b76ca3d0a535",
+        "iso_name": "ubuntu-16.04.2-server-amd64.iso",
+        "ssh_password": "vagrant",
+        "ssh_username": "vagrant",
+        "vm_name": "u1604lxde"
+    },
+    "builders": [{
+        "boot_command": [
+            "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+            "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+            "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+            "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+            "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+            "<bs><bs><bs><bs>",
+            "/install/vmlinuz noapic ",
+            "file=/floppy/preseed.cfg ",
+            "vga=788 ",
+            "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+            "hostname={{user `vm_name`}} ",
+            "grub-installer/bootdev=/dev/sda<wait> ",
+            "fb=false debconf/frontend=noninteractive ",
+            "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+            "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
+            "passwd/user-fullname=vagrant ",
+            "passwd/user-password=vagrant ",
+            "passwd/user-password-again=vagrant ",
+            "passwd/username=vagrant ",
+            "initrd=/install/initrd.gz quiet --- <enter>"
+        ],
+        "boot_wait": "10s",
+        "disk_size": 40960,
+        "floppy_files": [
+            "http/preseed.cfg"
+        ],
+        "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+        "guest_os_type": "Ubuntu_64",
+        "headless": false,
+        "hard_drive_interface": "sata",
+        "iso_checksum": "{{user `iso_checksum`}}",
+        "iso_checksum_type": "sha256",
+        "iso_urls": ["{{user `iso_name`}}",
+                     "http://releases.ubuntu.com/16.04/{{user `iso_name`}}"],
+        "post_shutdown_delay": "30s",
+        "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+        "ssh_password": "{{user `ssh_password`}}",
+        "ssh_port": 22,
+        "ssh_username": "{{user `ssh_username`}}",
+        "ssh_wait_timeout": "10000s",
+        "type": "virtualbox-iso",
+        "vboxmanage": [
+            ["modifyvm", "{{.Name}}", "--memory", "1024"],
+            ["modifyvm", "{{.Name}}", "--cpus", "1"],
+            ["modifyvm", "{{.Name}}", "--vram", "16"]
+        ],
+        "virtualbox_version_file": ".vbox_version",
+        "vm_name": "{{user `vm_name`}}"
+    }],
+    "post-processors": [{
+        "compression_level": "9",
+        "output": "build/ubuntu-1604-lxde-desktop.box",
+        "type": "vagrant"
+    }],
+    "provisioners": [
+        {
+            "environment_vars": [
+                "SSH_USERNAME={{user `ssh_username`}}"
+            ],
+            "type": "shell",
+            "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+            "scripts": [
+                "scripts/vagrant.sh",
+                "scripts/vboxguest.sh",
+                "scripts/compact.sh"
+            ]
+        }
+    ]
+}
