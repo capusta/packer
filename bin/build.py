@@ -49,13 +49,14 @@ args = vars(parser.parse_args());
 CODENAME = args['codename']
 if CODENAME == 'xenial':
     DWBASE = 'http://releases.ubuntu.com/16.04/'
-    DWFILE = 'ubuntu-16.04.2-server-i386.iso'
+    DWFILE = 'ubuntu-16.04.2-server-amd64.iso'
 elif 'xenial-mini' in CODENAME:
     DWBASE = 'http://ports.ubuntu.com/dists/xenial/main/installer-powerpc/current/images/powerpc64/netboot/',
     DWFILE = 'mini.iso'
     CODENAME = 'xenial'
 
-log("Starting build process for %s (%s)" % args['hostname'][0])
+log("Starting build process for %s (%s)" % (args['hostname'][0],CODENAME))
+
 if args['download'] is None:
     log("Downloading %s" % DWBASE + DWFILE)
     P2 = subprocess.Popen(['which', 'wget'])
@@ -80,10 +81,11 @@ except:
     sys.exit(1)
 
 # JSON variable file is generated dynamically before packer validation
-SHARED_VARS = {'hostname': args['hostname'][0]} # Hostname is different all the time
+SHARED_VARS = {'vm_name': args['hostname'][0]} # Hostname is different all the time
 SHARED_VARS['iso_checksum'] = MD5SUM            # Dynamic checksum so packer doesnt freak out
-SHARED_VARS['iso_file'] = DWFILE                # We might be using different ISO files
+SHARED_VARS['iso_name'] = DWFILE                # We might be using different ISO files
 SHARED_VARS['iso_checksum_type'] = 'md5'
+SHARED_VARS['codename'] = CODENAME   # To accomodate xenial 32bit + others
 
 # We might have packer hiding in our local bin directory
 ADD_PATH = os.getcwd()+'/bin:'
