@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 """
-    Generates a virtualbox image
+    Generates a virtualbox image, provisioned with ansible
 """
 import argparse
 from logging.handlers import RotatingFileHandler
@@ -14,7 +14,7 @@ import subprocess
 
 if len(sys.argv) == 1:
     print "Please use -h for usage"
-    print "Using defaults: --hostname devbox --codename trusty"
+    print "Using defaults: --hostname devbox --codename xenial"
     time.sleep(2)
 
 LOGGER = logging.getLogger("Rotating Log")
@@ -27,51 +27,35 @@ def log(MSG):
     LOGGER.info(time.strftime("%y-%m-%d:%H-%M: ")+ MSG)
 
 ## some global variables to help with ubuntu devs
-md5command=''
-md5sum=''
-myOS=''
+md5command = ''
+md5sum = ''
+myOS = ''
 if (os.name == 'posix' and platform.system() == 'Darwin'):
-    # Set up any mac variables here
-    log("System is mac")
-    myOS       = 'mac'
+    log("Mac OS Detected")
+    myOS = 'mac'
     md5command = 'md5'
 else:
-    # Set up Linux? variables here
-    log("System is Ubuntu")
+    log("Debian (Ubuntu) detected")
     myOS = 'Debian'
     md5command = 'md5sum'
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--hostname", nargs=1,   help='Set the hostname of the box, default is  devbox', default=['devbox'])
-parser.add_argument("--download", nargs='?', help='Download the ISO From Ubuntu', default=False)
-parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='trusty')
+parser.add_argument("--hostname", nargs=1,   help='Set the hostname of the box, default is devbox', default=['devbox'])
+parser.add_argument("--download", nargs='?', help='Download the ISO based on the codename', default=False)
+parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='xenial')
 args = vars(parser.parse_args());
-
-log("Using hostname %s" % args['hostname'][0])
 
 # NO case in python :(
 CODENAME = args['codename']
-if CODENAME == 'trusty32':
-    DWBASE = 'http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot'
+if CODENAME == 'xenial':
+    DWBASE = 'http://releases.ubuntu.com/16.04/'
+    DWFILE = 'ubuntu-16.04.2-server-i386.iso'
+elif 'xenial-mini' in CODENAME:
+    DWBASE = 'http://ports.ubuntu.com/dists/xenial/main/installer-powerpc/current/images/powerpc64/netboot/',
     DWFILE = 'mini.iso'
-    # Our teimplates in ./http dir use the codename without the arch
-    CODENAME = 'trusty'
-elif 'trusty' in CODENAME:
-    # Default case for trusty
-    DWBASE = 'http://releases.ubuntu.com/14.04'
-    DWFILE = 'ubuntu-14.04.5-server-amd64.iso'
-    CODENAME = 'trusty'
-elif CODENAME == 'xenial32':
-    DWBASE = 'http://archive.ubuntu.com/ubuntu/dists/trusty/main/installer-i386/current/images/netboot'
-    DWBASE = 'http://cdimage.ubuntu.com/lubuntu/releases/17.04/release'
-    DWFILE = 'mini.iso'
-    DWFILE = 'lubuntu-17.04-desktop-i386.iso'
-    CODENAME = 'xenial'
-else:
-    DWBASE = 'http://releases.ubuntu.com/16.04'
-    DWFILE = 'ubuntu-16.04.2-server-amd64.iso'
     CODENAME = 'xenial'
 
+log("Starting build process for %s (%s)" % args['hostname'][0])
 if args['download'] is None:
     log("Downloading %s" % DWBASE + DWFILE)
     P2 = subprocess.Popen(['which', 'wget'])
@@ -82,12 +66,10 @@ if args['download'] is None:
     # TODO: account for other operating systems
     P = subprocess.Popen(['wget', '-v', '-N', '-P', 'iso', '--progress=bar', DWBASE+"/"+DWFILE])
     P = subprocess.Popen([md5command, 'iso/'+DWFILE])
-    print P.communicate()[1]
 
 log('Checking md5sum for %s' % DWFILE)
 try:
     MD5SUM = subprocess.check_output([md5command, 'iso/'+DWFILE])
-    log("Tentative MD5 Sum: %s" % MD5SUM)
     if myOS == 'Debian':
         print "Not implemented yet"
         #TODO: Add support to extract checksum
@@ -105,7 +87,6 @@ SHARED_VARS['iso_checksum_type'] = 'md5'
 
 # We might have packer hiding in our local bin directory
 ADD_PATH = os.getcwd()+'/bin:'
-log("Adding %s to path" % ADD_PATH)
 MY_ENV = os.environ.copy()
 MY_ENV["PATH"] = ADD_PATH + MY_ENV["PATH"]
 
