@@ -45,6 +45,11 @@ parser.add_argument("--download", nargs='?', help='Download the ISO based on the
 parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='xenial')
 args = vars(parser.parse_args());
 
+# JSON variable file is generated dynamically before packer validation
+SHARED_VARS = {}
+# Hostname is different all the time
+SHARED_VARS['vm_name'] = args['hostname'][0]
+
 # NO case in python :(
 CODENAME = args['codename']
 if CODENAME == 'xenial':
@@ -54,6 +59,10 @@ elif 'xenial-mini' in CODENAME:
     DWBASE = 'http://ports.ubuntu.com/dists/xenial/main/installer-powerpc/current/images/powerpc64/netboot/',
     DWFILE = 'mini.iso'
     CODENAME = 'xenial'
+
+# Might use different codenames to use different builds
+SHARED_VARS['codename'] = CODENAME.strip()
+SHARED_VARS['iso_name'] = DWFILE                # We might be using different ISO files
 
 log("Starting build process for %s (%s)" % (args['hostname'][0],CODENAME))
 
@@ -71,21 +80,18 @@ if args['download'] is None:
 log('Checking md5sum for %s' % DWFILE)
 try:
     MD5SUM = subprocess.check_output([md5command, 'iso/'+DWFILE])
+    SHARED_VARS['iso_checksum_type'] = 'md5'
     if myOS == 'Debian':
-        print "Not implemented yet"
+        log("Debian code is Not implemented yet")
         #TODO: Add support to extract checksum
+        sys.exit(1)
     if myOS == 'mac':
         MD5SUM = MD5SUM.split("=")[1].strip()
 except:
     log("Unable to do md5 on the iso file %s, is it downloaded?" % DWFILE)
     sys.exit(1)
 
-# JSON variable file is generated dynamically before packer validation
-SHARED_VARS = {'vm_name': args['hostname'][0]} # Hostname is different all the time
 SHARED_VARS['iso_checksum'] = MD5SUM            # Dynamic checksum so packer doesnt freak out
-SHARED_VARS['iso_name'] = DWFILE                # We might be using different ISO files
-SHARED_VARS['iso_checksum_type'] = 'md5'
-SHARED_VARS['codename'] = CODENAME   # To accomodate xenial 32bit + others
 
 # We might have packer hiding in our local bin directory
 ADD_PATH = os.getcwd()+'/bin:'
@@ -93,14 +99,15 @@ MY_ENV = os.environ.copy()
 MY_ENV["PATH"] = ADD_PATH + MY_ENV["PATH"]
 
 # Generating var file in json format - consumed by packer
-with open('http/ubuntu.vars', 'w') as outfile:
+VARFILE = 'http/vars'
+with open(VARFILE, 'w') as outfile:
     json.dump(SHARED_VARS, outfile)
 
-PACKER_TEMPLATE = 'http/'+CODENAME.strip()+'.json'
+PACKER_TEMPLATE = 'http/'+SHARED_VARS['codename']+'.json'
 MYPACKER = subprocess.check_output(['which', 'packer']).strip()
 log("Validating %s with %s " % (PACKER_TEMPLATE, MYPACKER))
 
-P = subprocess.Popen(['packer', 'validate', '-var-file=http/ubuntu.vars', PACKER_TEMPLATE], stdout=subprocess.PIPE)
+P = subprocess.Popen(['packer', 'validate', '-var-file='+VARFILE, PACKER_TEMPLATE], stdout=subprocess.PIPE)
 P.communicate()
 if P.returncode == 1:
     log("%s validation error.  Exit %d" % (PACKER_TEMPLATE, P.returncode))
@@ -110,5 +117,4 @@ else:
 
 # The actual build of devbox
 log("Starting Packer build")
-P = subprocess.Popen(['packer', 'build', '-force', '-on-error=abort',
-                      '-var-file=http/ubuntu.vars', PACKER_TEMPLATE])
+P = subprocess.Popen(['packer', 'build', '-force', '-on-error=abort', '-var-file='+VARFILE, PACKER_TEMPLATE])
