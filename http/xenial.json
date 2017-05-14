@@ -8,10 +8,10 @@
     "iso_checksum": "{{user `iso_checksum`}}",
     "iso_checksum_type": "{{user `iso_checksum_type`}}",
     "vm_name": "{{user `vm_name`}}",
-    "ssh_username": "root",
-    "ssh_password": "ansible",
-    "ssh_wait_timeout": "1000s",
-    "boot_wait": "5s",
+    "ssh_username": "vagrant",
+    "ssh_password": "vagrant",
+    "ssh_wait_timeout": "15m",
+    "boot_wait": "8s",
     "disk_size": "60000",
     "format": "ova",
     "output_directory": "{{user `output_directory` }}",
@@ -19,9 +19,6 @@
     "vboxmanage": [
       ["modifyvm", "{{.Name}}", "--memory", "1024"],
       ["modifyvm", "{{.Name}}", "--cpus", "2"]
-    ],
-    "floppy_files": [
-      "http/xenial.ks"
     ],
     "http_directory": ".",
     "boot_command": [
@@ -32,7 +29,6 @@
       "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
       "<bs><bs><bs><bs>",
       "/install/vmlinuz noapic ",
-      "file=/floppy/xenial.ks ",
       "vga=788 ",
       "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
       "hostname={{user `vm_name`}} ",
@@ -45,6 +41,7 @@
       "passwd/user-password-again=vagrant ",
       "passwd/username=vagrant ",
       "initrd=/install/initrd.gz quiet --- <enter>"
+      " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/xenial.ks",
     ],
     "shutdown_command": "shutdown -P now"
 }
