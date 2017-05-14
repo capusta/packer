@@ -22,3 +22,4 @@ wget-log.*
 output-virtualbox-iso/
 build/
 packer_cache/
+build/

@@ -49,6 +49,7 @@ args = vars(parser.parse_args());
 SHARED_VARS = {}
 # Hostname is different all the time
 SHARED_VARS['vm_name'] = args['hostname'][0]
+SHARED_VARS['output_directory'] = 'build'
 
 # NO case in python :(
 CODENAME = args['codename']
