@@ -12,12 +12,12 @@
     "ssh_password": "vagrant",
     "ssh_wait_timeout": "15m",
     "boot_wait": "8s",
-    "disk_size": "60000",
+    "disk_size": "40000",
     "format": "ova",
     "output_directory": "{{user `output_directory` }}",
     "headless": false,
     "vboxmanage": [
-      ["modifyvm", "{{.Name}}", "--memory", "1024"],
+      ["modifyvm", "{{.Name}}", "--memory", "2048"],
       ["modifyvm", "{{.Name}}", "--cpus", "2"]
     ],
     "http_directory": ".",
@@ -40,28 +40,19 @@
       "passwd/user-password=vagrant ",
       "passwd/user-password-again=vagrant ",
       "passwd/username=vagrant ",
-      "initrd=/install/initrd.gz quiet --- <enter>"
+      " initrd=/install/initrd.gz quiet",
       " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/xenial.ks",
+      " -- <wait>",
+      "<enter><wait>"
     ],
     "shutdown_command": "shutdown -P now"
 }
   ],
   "provisioners": [
-    {
-    "type": "shell",
-    "inline": [
-      "mkdir /root/.ssh"
-    ]
-   },
-   {
-     "type": "file",
-     "source": "./http/id_rsa_ansible.pub",
-     "destination": "/root/.ssh/authorized_keys"
-   },
    {
      "type": "ansible",
      "playbook_file": "./ansible/kickstart.yml",
-     "user": "root",
+     "user": "vagrant",
      "extra_arguments": ["--diff"]
     },
     {
@@ -69,7 +60,8 @@
      "scripts": [
          "scripts/setup.sh",
          "scripts/cleanup.sh"
-    ]
+    ],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"
     }
  ]
 }
