@@ -1,4 +1,3 @@
-d-i partman-auto/method string lvm
 choose-mirror-bin mirror/http/proxy string
 d-i base-installer/kernel/override-image string linux-server
 d-i clock-setup/utc boolean true
@@ -8,7 +7,7 @@ d-i grub-installer/only_debian boolean true
 d-i grub-installer/with_other_os boolean true
 d-i partman-auto-lvm/guided_size string max
 d-i partman-auto/choose_recipe select atomic
-d-i partman-auto/method string regular
+d-i partman-auto/method string lvm
 d-i partman-lvm/confirm boolean true
 d-i partman-lvm/confirm_nooverwrite boolean true
 d-i partman-lvm/device_remove_lvm boolean true

@@ -1,2 +1,2 @@
 [devbox]
-localhost
+localhost ansible_port=2223
