@@ -10,15 +10,15 @@
     "vm_name": "{{user `vm_name`}}",
     "ssh_username": "vagrant",
     "ssh_password": "vagrant",
-    "ssh_wait_timeout": "15m",
-    "boot_wait": "8s",
+    "ssh_wait_timeout": "20m",
     "disk_size": "40000",
     "format": "ova",
     "output_directory": "{{user `output_directory` }}",
     "headless": false,
     "vboxmanage": [
       ["modifyvm", "{{.Name}}", "--memory", "2048"],
-      ["modifyvm", "{{.Name}}", "--cpus", "2"],
+      ["modifyvm", "{{.Name}}", "--cpus", "1"],
+      ["modifyvm", "{{.Name}}", "--vram", "16"],
       ["modifyvm", "{{.Name}}", "--natpf1", "devboxssh,tcp,,2223,,22"]
     ],
     "http_directory": ".",
