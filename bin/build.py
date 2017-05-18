@@ -3,39 +3,33 @@
     Generates a virtualbox image, provisioned with ansible
 """
 import argparse
-from logging.handlers import RotatingFileHandler
-import logging
 import sys
-import time
 import os
 import platform
 import json
 import subprocess
+import time
+
+# Import relative files
+import common
+
 
 if len(sys.argv) == 1:
     print "Please use -h for usage"
     print "Using defaults: --hostname devbox --codename xenial"
     time.sleep(2)
 
-LOGGER = logging.getLogger("Rotating Log")
-LOGGER.setLevel(logging.INFO)
-HANDLER = RotatingFileHandler('logs/build.log', maxBytes=10*1024, backupCount=5)
-LOGGER.addHandler(HANDLER)
-
-def log(MSG):
-    print time.strftime("%y-%m-%d:%H-%M: ") + MSG
-    LOGGER.info(time.strftime("%y-%m-%d:%H-%M: ")+ MSG)
 
 ## some global variables to help with ubuntu devs
 md5command = ''
 md5sum = ''
 myOS = ''
 if (os.name == 'posix' and platform.system() == 'Darwin'):
-    log("Mac OS Detected")
+    common.log("Mac OS Detected")
     myOS = 'mac'
     md5command = 'md5'
 else:
-    log("Debian (Ubuntu) detected")
+    common.log("Debian (Ubuntu) detected")
     myOS = 'Debian'
     md5command = 'md5sum'
 
@@ -65,31 +59,31 @@ elif 'xenial-mini' in CODENAME:
 SHARED_VARS['codename'] = CODENAME.strip()
 SHARED_VARS['iso_name'] = DWFILE                # We might be using different ISO files
 
-log("Starting build process for %s (%s)" % (args['hostname'][0],CODENAME))
+common.log("Starting build process for %s (%s)" % (args['hostname'][0],CODENAME))
 
 if args['download'] is None:
-    log("Downloading %s" % DWBASE + DWFILE)
+    common.log("Downloading %s" % DWBASE + DWFILE)
     P2 = subprocess.Popen(['which', 'wget'])
     P2.communicate()[0]
     if P2.returncode == 1:
-        log("Cannot find wget - make sure to install wget 'brew install wget' if this is a mac")
+        common.log("Cannot find wget - make sure to install wget 'brew install wget' if this is a mac")
         exit()
     # TODO: account for other operating systems
     P = subprocess.Popen(['wget', '-v', '-N', '-P', 'iso', '--progress=bar', DWBASE+"/"+DWFILE])
     P = subprocess.Popen([md5command, 'iso/'+DWFILE])
 
-log('Checking md5sum for %s' % DWFILE)
+common.log('Checking md5sum for %s' % DWFILE)
 try:
     MD5SUM = subprocess.check_output([md5command, 'iso/'+DWFILE])
     SHARED_VARS['iso_checksum_type'] = 'md5'
     if myOS == 'Debian':
-        log("Debian code is Not implemented yet")
+        common.log("Debian code is Not implemented yet")
         #TODO: Add support to extract checksum
         sys.exit(1)
     if myOS == 'mac':
         MD5SUM = MD5SUM.split("=")[1].strip()
 except:
-    log("Unable to do md5 on the iso file %s, is it downloaded?" % DWFILE)
+    common.log("Unable to do md5 on the iso file %s, is it downloaded?" % DWFILE)
     sys.exit(1)
 
 SHARED_VARS['iso_checksum'] = MD5SUM            # Dynamic checksum so packer doesnt freak out
@@ -106,16 +100,16 @@ with open(VARFILE, 'w') as outfile:
 
 PACKER_TEMPLATE = 'http/'+SHARED_VARS['codename']+'.json'
 MYPACKER = subprocess.check_output(['which', 'packer']).strip()
-log("Validating %s with %s " % (PACKER_TEMPLATE, MYPACKER))
+common.log("Validating %s with %s " % (PACKER_TEMPLATE, MYPACKER))
 
 P = subprocess.Popen(['packer', 'validate', '-var-file='+VARFILE, PACKER_TEMPLATE], stdout=subprocess.PIPE)
 P.communicate()
 if P.returncode == 1:
-    log("%s validation error.  Exit %d" % (PACKER_TEMPLATE, P.returncode))
+    common.log("%s validation error.  Exit %d" % (PACKER_TEMPLATE, P.returncode))
     sys.exit(P.returncode)
 else:
-    log("Validation of %s return: %d" % (PACKER_TEMPLATE, P.returncode))
+    common.log("Validation of %s return: %d" % (PACKER_TEMPLATE, P.returncode))
 
 # The actual build of devbox
-log("Starting Packer build")
+common.log("Starting Packer build")
 P = subprocess.Popen(['packer', 'build', '-force', '-on-error=abort', '-var-file='+VARFILE, PACKER_TEMPLATE])
