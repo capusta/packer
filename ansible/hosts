@@ -1,2 +1,2 @@
 [devbox]
-localhost ansible_port=2223
+localhost ansible_ssh_port=2223 ansible_ssh_user=vagrant ansible_ssh_password=vagrant
