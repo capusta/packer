@@ -10,3 +10,7 @@ if($?){
     choco install puppet-agent --force -y
 }
 & $puppet module install puppetlabs-chocolatey --version 2.0.2
+& $puppet 'apply' '--test' "$PSScriptRoot\test.pp" 
+
+nssm set consul Application (Get-Command consul).Path
+nssm set consul AppParameters agent -bootstrap -server -ui -node $hostname -advertise $ipaddress --data-dir c:\var\consul
