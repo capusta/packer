@@ -5,7 +5,7 @@ $puppet = 'C:\Program Files\Puppet Labs\Puppet\bin\puppet.bat'
 Test-Path $puppet
 if($?){
     Write-Host "puppet-agent OK"
-#    choco upgrade puppet-agent
+    choco upgrade puppet-agent
 } else {
     choco install puppet-agent --force -y
 }
