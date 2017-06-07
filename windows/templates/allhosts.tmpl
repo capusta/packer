@@ -1,4 +1,4 @@
-{{range $index, $node := service "consul"}}
-#node:{{.Address}}:{{.Port}}
+{{range nodes}}
+#node:{{.Name}}:{{.Address}}:{{.Port}}
 {{end}}
 
