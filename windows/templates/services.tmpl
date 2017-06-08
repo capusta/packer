@@ -1,3 +1,4 @@
-{{range services}}
-#service {{.Name}}
+{{range services}}{{range $index, $node := service .Name }}
+#service:{{.Name}}:{{.Address}}:{{.Port}}
+{{end}}
 {{end}}
