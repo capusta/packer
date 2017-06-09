@@ -16,7 +16,7 @@ nssm set consul Application (Get-Command consul).Path
 nssm set consul AppParameters agent -bootstrap -domain local -server -ui -node $hostname -advertise $ipaddress --data-dir c:\var\consul
 
 nssm set consul-template Application (Get-Command consul-template).Path
-nssm set consul-template AppParameters -config=c:\var\consul-template\conf -consul-addr $ipaddress:8500
+& nssm set consul-template AppParameters -config=c:\var\consul-template\conf -consul="$ipaddress:8500"
 
 & $puppet apply --test .
 Write-Host "Finished setting up.  Please run 'puppet apply --tags <tag> to continue'"
