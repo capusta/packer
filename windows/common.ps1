@@ -1,6 +1,13 @@
 $hostname = $(get-childitem -path env:computername).value
 $ipaddress = $(ipconfig | where {$_ -match 'IPv4.+\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' } | out-null; $Matches[1])
 
+Get-Command choco
+if($?){
+  Write-Host "chocolatey installed"
+} else {
+  iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+}
+
 $puppet = 'C:\Program Files\Puppet Labs\Puppet\bin\puppet.bat'
 Test-Path $puppet
 if($?){
