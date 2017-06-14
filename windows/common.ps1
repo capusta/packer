@@ -15,6 +15,9 @@ if($?){
     choco upgrade puppet-agent
 } else {
     choco install puppet-agent --force -y
+    choco install consul --force -y
+    choco install consul-template --force -y
+    choco install nssm --force -y
 }
 & $puppet module install puppetlabs-chocolatey --version 2.0.2
 & $puppet module install KyleAnderson-consul --version 3.0.0
