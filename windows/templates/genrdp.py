@@ -1,10 +1,27 @@
 #! /usr/bin/env python
+""" Quick Script to Generate RDP files """
 import sys
 import re
 import os
+import logging
+import time
+
+from logging.handlers import RotatingFileHandler
+logger = logging.getLogger("RotatingLog")
+logger.setLevel(logging.INFO)
+handler = RotatingFileHandler('c:\\var\\logs\\syslog.log')
+logger.addHandler(handler)
+
+def log(msg):
+    fmt_msg = time.strftime("%y-%m-%d:%H-%M: ") + msg
+    print("%s" % fmt_msg)
+    logger.info(fmt_msg)
+
 infile, outdir = sys.argv[1], sys.argv[2]
+log("Starting Operations")
 
 with open(infile) as inf:
+    log("opened file %s" % infile)
     for line in inf:
         pattern = re.compile("^#node")
         if pattern.match(line):
