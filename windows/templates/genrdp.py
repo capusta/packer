@@ -27,7 +27,8 @@ with open(infile) as inf:
         if pattern.match(line):
             line = line.split(':')
             f = os.path.join(sys.argv[2],line[1]+".rdp")
-            t = open(f,'w')
+            log("opening rdp file for writing %s" % f)
+            t = open(f,'w+')
             template = """
             screen mode id:i:2
             use multimon:i:0
@@ -84,4 +85,5 @@ with open(infile) as inf:
                 "nuser":username
             }
             t.write(template.format(**context))
+            log("Written template")
             t.close()
