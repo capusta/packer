@@ -1,7 +1,7 @@
 include chocolatey
 Package { provider => chocolatey }
 
-package { ['nssm', 'consul', 'consul-template', 'python3']:
+package { ['nssm', 'consul', 'consul-template', 'python3', 'ruby']:
   ensure => latest
 }
 
