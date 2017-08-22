@@ -10,21 +10,25 @@ import json
 import subprocess
 import time
 
-# Import relative files
+##### Import relative files
 import common
 
-
+##### Quick check CLI Arguments
 if len(sys.argv) == 1:
     print "Please use -h for usage"
     print "Using defaults: --hostname devbox --codename xenial"
     time.sleep(2)
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--hostname", nargs=1,   help='Set the hostname of the box, default is devbox', default=['devbox'])
+parser.add_argument("--download", nargs='?', help='Download the ISO based on the codename', default=False)
+parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='xenial')
+args = vars(parser.parse_args());
 
-## some global variables to help with ubuntu devs
 md5command = ''
 md5sum = ''
 myOS = ''
-if (os.name == 'posix' and platform.system() == 'Darwin'):
+if os.name == 'posix' and platform.system() == 'Darwin':
     common.log("Mac OS Detected")
     myOS = 'mac'
     md5command = 'md5'
@@ -32,12 +36,6 @@ else:
     common.log("Debian (Ubuntu) detected")
     myOS = 'Debian'
     md5command = 'md5sum'
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--hostname", nargs=1,   help='Set the hostname of the box, default is devbox', default=['devbox'])
-parser.add_argument("--download", nargs='?', help='Download the ISO based on the codename', default=False)
-parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='xenial')
-args = vars(parser.parse_args());
 
 # JSON variable file is generated dynamically before packer validation
 SHARED_VARS = {}
@@ -102,7 +100,7 @@ PACKER_TEMPLATE = 'http/'+SHARED_VARS['codename']+'.json'
 MYPACKER = subprocess.check_output(['which', 'packer']).strip()
 common.log("Validating %s with %s " % (PACKER_TEMPLATE, MYPACKER))
 
-P = subprocess.Popen(['packer', 'validate', '-var-file='+VARFILE, PACKER_TEMPLATE], stdout=subprocess.PIPE)
+P = subprocess.Popen([MYPACKER, 'validate', '-var-file='+VARFILE, PACKER_TEMPLATE], stdout=subprocess.PIPE)
 P.communicate()
 if P.returncode == 1:
     common.log("%s validation error.  Exit %d" % (PACKER_TEMPLATE, P.returncode))
@@ -112,4 +110,4 @@ else:
 
 # The actual build of devbox
 common.log("Starting Packer build")
-P = subprocess.Popen(['packer', 'build', '-force', '-on-error=abort', '-var-file='+VARFILE, PACKER_TEMPLATE])
+P = subprocess.Popen([MYPACKER, 'build', '-force', '-on-error=abort', '-var-file='+VARFILE, PACKER_TEMPLATE])
