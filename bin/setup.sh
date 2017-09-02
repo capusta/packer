@@ -23,9 +23,10 @@ function out_warn {
 }
 function install_packer {
     out_warn "Installing packer"
-    wget -c -v https://releases.hashicorp.com/packer/1.0.0/packer_1.0.0_linux_amd64.zip
-    unzip packer_1.0.0_linux_amd64.zip
-    rm packer_1.0.0_linux_amd64.zip
+    p_v='1.0.4'
+    wget -c -v https://releases.hashicorp.com/packer/${p_v}/packer_${p_v}_linux_amd64.zip
+    unzip packer_${p_v}_linux_amd64.zip
+    rm packer_${p_v}_linux_amd64.zip
     mv packer bin/ -fv
     return
 }
