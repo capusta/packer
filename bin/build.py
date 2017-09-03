@@ -13,17 +13,17 @@ import time
 ##### Import relative files
 import common
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-n","--name", nargs=1,   help='Set the hostname of the box, default is devbox', default=['devbox'])
+parser.add_argument("-d","--download", nargs='?', help='Download the ISO based on the codename', default=False)
+parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='xenial')
+args = vars(parser.parse_args());
+
 ##### Quick check CLI Arguments
 if len(sys.argv) == 1:
     print "Please use -h for usage"
-    print "Using defaults: --hostname devbox --codename xenial"
-    time.sleep(2)
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--hostname", nargs=1,   help='Set the hostname of the box, default is devbox', default=['devbox'])
-parser.add_argument("--download", nargs='?', help='Download the ISO based on the codename', default=False)
-parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='xenial')
-args = vars(parser.parse_args());
+    print "Using defaults: --name devbox --codename xenial"
+    time.sleep(3)
 
 md5command = ''
 md5sum = ''
@@ -64,8 +64,8 @@ if args['download'] is None:
     P2 = subprocess.Popen(['which', 'wget'])
     P2.communicate()[0]
     if P2.returncode == 1:
-        common.log("Cannot find wget - make sure to install wget 'brew install wget' if this is a mac")
-        exit()
+        common.log("Cannot find wget - make sure it is installed")
+        sys.exit(1)
     # TODO: account for other operating systems
     P = subprocess.Popen(['wget', '-v', '-N', '-P', 'iso', '--progress=bar', DWBASE+"/"+DWFILE])
     P = subprocess.Popen([md5command, 'iso/'+DWFILE])
