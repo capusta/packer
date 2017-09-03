@@ -40,24 +40,28 @@ else:
 # JSON variable file is generated dynamically before packer validation
 SHARED_VARS = {}
 # Hostname is different all the time
-SHARED_VARS['vm_name'] = args['hostname'][0]
+SHARED_VARS['vm_name'] = args['name'][0]
 SHARED_VARS['output_directory'] = 'build'
 
 # NO case in python :(
 CODENAME = args['codename']
+# Might use different codenames to use different builds
+SHARED_VARS['codename'] = CODENAME.strip()
+
 if CODENAME == 'xenial':
     DWBASE = 'http://releases.ubuntu.com/16.04/'
     DWFILE = 'ubuntu-16.04.2-server-amd64.iso'
+elif CODENAME == 'zesty':
+    DWBASE = 'http://cdimage.ubuntu.com/lubuntu/releases/17.04/release/'
+    DWFILE='lubuntu-17.04-desktop-amd64.iso'
 elif 'xenial-mini' in CODENAME:
     DWBASE = 'http://ports.ubuntu.com/dists/xenial/main/installer-powerpc/current/images/powerpc64/netboot/',
     DWFILE = 'mini.iso'
     CODENAME = 'xenial'
 
-# Might use different codenames to use different builds
-SHARED_VARS['codename'] = CODENAME.strip()
 SHARED_VARS['iso_name'] = DWFILE                # We might be using different ISO files
 
-common.log("Starting build process for %s (%s)" % (args['hostname'][0],CODENAME))
+common.log("Starting build process for %s (%s)" % (args['name'][0],CODENAME))
 
 if args['download'] is None:
     common.log("Downloading %s" % DWBASE + DWFILE)

@@ -28,7 +28,7 @@ while true; do
         --os)
 			case $2 in
 				ubuntu)
-					OS='http://releases.ubuntu.com/16.04/ubuntu-16.04.1-server-amd64.iso'
+					OS='http://cdimage.ubuntu.com/lubuntu/releases/17.04/release/lubuntu-17.04-desktop-amd64.iso'
 					;;
 				centos)
 					OS='http://mirror.atlantic.net/centos/7/isos/x86_64/CentOS-7-x86_64-Everything-1611.iso'
