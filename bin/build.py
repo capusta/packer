@@ -52,9 +52,9 @@ if CODENAME == 'xenial':
     DWBASE = 'http://releases.ubuntu.com/16.04/'
     DWFILE = 'ubuntu-16.04.2-server-amd64.iso'
 elif CODENAME == 'zesty':
-    DWBASE = 'http://cdimage.ubuntu.com/lubuntu/releases/17.04/release/'
-    DWFILE='lubuntu-17.04-desktop-amd64.iso'
-elif 'xenial-mini' in CODENAME:
+    DWBASE = 'http://releases.ubuntu.com/17.04/'
+    DWFILE = 'ubuntu-17.04-server-amd64.iso'
+elif CODENAME == 'xenial-mini':
     DWBASE = 'http://ports.ubuntu.com/dists/xenial/main/installer-powerpc/current/images/powerpc64/netboot/',
     DWFILE = 'mini.iso'
     CODENAME = 'xenial'
@@ -76,7 +76,7 @@ if args['download'] is None:
 
 common.log('Checking md5sum for %s' % DWFILE)
 try:
-    MD5SUM = subprocess.check_output([md5command, 'iso/'+DWFILE])
+    MD5SUM = subprocess.check_output(['openssl','md5', 'iso/'+DWFILE])
     SHARED_VARS['iso_checksum_type'] = 'md5'
     if myOS == 'Debian':
         common.log("Debian code is Not implemented yet")
@@ -89,6 +89,7 @@ except:
     sys.exit(1)
 
 SHARED_VARS['iso_checksum'] = MD5SUM            # Dynamic checksum so packer doesnt freak out
+common.log("Updated http/vars with MD5 sum: {0}".format(MD5SUM))
 
 # We might have packer hiding in our local bin directory
 ADD_PATH = os.getcwd()+'/bin:'

@@ -12,7 +12,6 @@ LOGGER.setLevel(logging.INFO)
 HANDLER = RotatingFileHandler('logs/build.log', maxBytes=10*1024, backupCount=5)
 LOGGER.addHandler(HANDLER)
 
-
 def log(MSG):
     print time.strftime("%y-%m-%d:%H-%M: ") + MSG
     LOGGER.info(time.strftime("%y-%m-%d:%H-%M: ")+ MSG)
