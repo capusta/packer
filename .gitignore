@@ -17,9 +17,15 @@ bin/packer
 wget-log
 wget-log.*
 
+# Vagrant
+.vagrant/
+Vagrantfile
+
 # Folder stuff
 .idea/
 output-virtualbox-iso/
-build/
 packer_cache/
-build/
+
+# Artifacts
+*.iso
+*.box
