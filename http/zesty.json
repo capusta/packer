@@ -1,8 +1,8 @@
 {
   "post-processors": [
     {
-      "output": "builds/{{user `vm_name`}}.{{.Provider}}.box",
-      "vagrantfile_template": "files/Vagrantfile",
+      "output": "build/{{user `vm_name`}}.{{.Provider}}.box",
+      "vagrantfile_template": "http/Vagrantfile",
       "type": "vagrant"
     }
   ]
