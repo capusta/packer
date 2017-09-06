@@ -105,8 +105,11 @@ PACKER_TEMPLATE = 'http/'+SHARED_VARS['codename']+'.json'
 MYPACKER = subprocess.check_output(['which', 'packer']).strip()
 common.log("Validating %s with %s " % (PACKER_TEMPLATE, MYPACKER))
 
-P = subprocess.Popen([MYPACKER, 'validate', '-var-file='+VARFILE, PACKER_TEMPLATE], stdout=subprocess.PIPE)
+cmd = [MYPACKER, 'validate', '-var-file='+VARFILE, PACKER_TEMPLATE]
+common.log("Running command: {0}".format(' '.join(cmd)))
+P = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 P.communicate()
+
 if P.returncode == 1:
     common.log("%s validation error.  Exit %d" % (PACKER_TEMPLATE, P.returncode))
     sys.exit(P.returncode)

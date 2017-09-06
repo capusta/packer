@@ -1,7 +1,25 @@
 {
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "./ansible/kickstart.yml",
+      "user": "vagrant",
+      "extra_arguments": ["--diff"]
+    },
+    {
+      "type": "shell",
+      "scripts": [
+        "scripts/setup.sh",
+        "scripts/cleanup.sh"
+      ],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'"
+    }
+  ],
   "post-processors": [
     {
       "output": "build/{{user `vm_name`}}.{{.Provider}}.box",
+      "compression_level": "9",
+      "keep_input_artifact": true,
       "vagrantfile_template": "http/Vagrantfile",
       "type": "vagrant"
     }

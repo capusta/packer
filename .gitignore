@@ -28,4 +28,6 @@ packer_cache/
 
 # Artifacts
 *.iso
+*.ova
 *.box
+*.vdi
