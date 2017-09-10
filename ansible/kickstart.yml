@@ -1,6 +1,6 @@
 ---
 - name: Set up disabling screen saver
-  hosts: devbox
+  hosts: all
   tasks:
     - name: register power light locker setting
       shell: gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout

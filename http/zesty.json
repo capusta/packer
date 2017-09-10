@@ -16,7 +16,7 @@
       "output_directory": "{{user `output_directory` }}",
       "headless": false,
       "boot_wait": "10s",
-      "vboxmanage":
+      "vboxmanage": [
         ["modifyvm", "{{.Name}}", "--memory", "2048"],
         ["modifyvm", "{{.Name}}", "--cpus", "2"],
         ["modifyvm", "{{.Name}}", "--hwvirtex", "on"],
@@ -33,6 +33,7 @@
         "<bs><bs><bs><bs>",
         "/install/vmlinuz noapic ",
         "vga=788 ",
+        "interface=auto ",
         "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
         "hostname={{user `vm_name`}} ",
         "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/zesty.ks<wait> ",
@@ -49,7 +50,6 @@
     {
       "type": "ansible",
       "playbook_file": "./ansible/kickstart.yml",
-      "user": "vagrant",
       "extra_arguments": ["--diff"]
     },
     {
