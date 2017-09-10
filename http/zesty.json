@@ -11,6 +11,7 @@
       "ssh_username": "vagrant",
       "ssh_password": "vagrant",
       "ssh_wait_timeout": "200m",
+      "disk_size": "50000",
       "format": "ova",
       "output_directory": "{{user `output_directory` }}",
       "headless": false,
@@ -37,6 +38,8 @@
         "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/http/zesty.ks<wait> ",
         "grub-installer/bootdev=/dev/sda<wait> ",
         "fb=false debconf/frontend=noninteractive ",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+        "keyboard-configuration/variant=USA console-setup/ask_detect=false ",
         "initrd=/install/initrd.gz quiet --- <enter>"
       ],
       "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now"
@@ -60,8 +63,8 @@
   ],
   "post-processors": [
     {
-      "output": "build/{{user `vm_name`}}.{{.Provider}}.box",
       "compression_level": "9",
+      "output": "build/{{user `box_basename`}}.{{.Provider}}.box",
       "keep_input_artifact": true,
       "vagrantfile_template": "http/Vagrantfile",
       "type": "vagrant"

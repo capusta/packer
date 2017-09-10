@@ -26,4 +26,8 @@ d-i time/zone string America/Los_Angeles
 
 # Only ask the UTC question if there are other operating systems installed.
 d-i clock-setup/utc-auto boolean true
+d-i pkgsel/update-policy select unattended-upgrades
+d-i pkgsel/upgrade select safe-upgrade
+d-i user-setup/allow-password-weak boolean true
 d-i user-setup/encrypt-home boolean false
+tasksel tasksel/first multiselect standard, ubuntu-server
