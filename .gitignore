@@ -1,5 +1,6 @@
 # Specifically Ignored for the build process
 http/vars
+http/zesty.ks
 
 # Random Binaries
 bin/packer
@@ -31,3 +32,4 @@ packer_cache/
 *.ova
 *.box
 *.vdi
+*.retry

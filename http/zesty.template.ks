@@ -23,7 +23,6 @@ d-i time/zone string America/Los_Angeles
 d-i clock-setup/utc-auto boolean true
 
 # Network Setup
-d-i netcfg/get_hostname string {{vm_name}}
 d-i netcfg/get_domain string
 # https://bugs.launchpad.net/ubuntu/+source/netcfg/+bug/713385
 d-i netcfg/choose_interface select auto
@@ -48,8 +47,8 @@ d-i partman/confirm_write_new_label boolean true
 
 # User Creation
 d-i passwd/user-uid string 900
-d-i passwd/user-fullname string vagrant
-d-i passwd/username string vagrant
+d-i passwd/user-fullname string $vm_user
+d-i passwd/username string $vm_user
 d-i passwd/user-password password vagrant
 d-i passwd/user-password-again password vagrant
 d-i passwd/auto-login boolean true
@@ -58,7 +57,7 @@ d-i user-setup/encrypt-home boolean false
 
 # Package Selection
 d-i pkgsel/include string openssh-server cryptsetup build-essential libssl-dev libreadline-dev \
-zlib1g-dev dkms nfs-common ntp curl linux-headers-$(uname -r) build-essential dkms lubuntu-desktop
+zlib1g-dev dkms nfs-common ntp curl build-essential dkms lubuntu-desktop
 # Disable Proxy when downloading apt packages
 d-i mirror/http/proxy string
 d-i pkgsel/update-policy select unattended-upgrades

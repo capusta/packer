@@ -8,15 +8,14 @@ import os
 import platform
 import json
 import subprocess
-import time
 
 ##### Import relative files
 import common
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-n","--name", nargs=1,   help='Set the hostname of the box, default is devbox', default=['devbox'])
 parser.add_argument("-d","--download", nargs='?', help='Download the ISO based on the codename', default=False)
 parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='xenial')
+parser.add_argument("--hostname", nargs=1,   help='VM Hostname, default is devbox', default=['devbox'])
 args = vars(parser.parse_args());
 
 ##### Quick check CLI Arguments
@@ -38,9 +37,10 @@ else:
     md5command = 'md5sum'
 
 # JSON variable file is generated dynamically before packer validation
+# We will dump this variable to json var file
 SHARED_VARS = {}
 # Hostname is different all the time
-SHARED_VARS['vm_name'] = args['name'][0]
+SHARED_VARS['vm_name'] = args['hostname'][0]
 SHARED_VARS['output_directory'] = 'build'
 
 # NO case in python :(
@@ -54,14 +54,9 @@ if CODENAME == 'xenial':
 elif CODENAME == 'zesty':
     DWBASE = 'http://releases.ubuntu.com/17.04/'
     DWFILE = 'ubuntu-17.04-server-amd64.iso'
-elif CODENAME == 'xenial-mini':
-    DWBASE = 'http://ports.ubuntu.com/dists/xenial/main/installer-powerpc/current/images/powerpc64/netboot/',
-    DWFILE = 'mini.iso'
-    CODENAME = 'xenial'
 
 SHARED_VARS['iso_name'] = DWFILE                # We might be using different ISO files
-
-common.log("Starting build process for %s (%s)" % (args['name'][0],CODENAME))
+common.log("Starting build process for %s (%s) user %s" % (SHARED_VARS['vm_name'],CODENAME,SHARED_VARS['vm_user']))
 
 if args['download'] is None:
     common.log("Downloading %s" % DWBASE + DWFILE)
@@ -74,8 +69,8 @@ if args['download'] is None:
     P = subprocess.Popen(['wget', '-v', '-N', '-P', 'iso', '--progress=bar', DWBASE+"/"+DWFILE])
     P = subprocess.Popen([md5command, 'iso/'+DWFILE])
 
-common.log('Checking md5sum for %s' % DWFILE)
 try:
+    common.log('Checking md5sum for %s' % DWFILE)
     MD5SUM = subprocess.check_output(['openssl','md5', 'iso/'+DWFILE])
     SHARED_VARS['iso_checksum_type'] = 'md5'
     if myOS == 'Debian':
@@ -96,7 +91,9 @@ ADD_PATH = os.getcwd()+'/bin:'
 MY_ENV = os.environ.copy()
 MY_ENV["PATH"] = ADD_PATH + MY_ENV["PATH"]
 
+# -------------------------------------------------------
 # Generating var file in json format - consumed by packer
+
 VARFILE = 'http/vars'
 with open(VARFILE, 'w') as outfile:
     json.dump(SHARED_VARS, outfile)
@@ -118,4 +115,4 @@ else:
 
 # The actual build of devbox
 common.log("Starting Packer build")
-P = subprocess.Popen([MYPACKER, 'build', '-force', '-on-error=abort', '-var-file='+VARFILE, PACKER_TEMPLATE])
+P = subprocess.Popen([MYPACKER, 'build', '-force', '-on-error=ask', '-var-file='+VARFILE, PACKER_TEMPLATE])
