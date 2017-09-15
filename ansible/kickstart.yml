@@ -2,6 +2,15 @@
 - name: Set up disabling screen saver
   hosts: all
   tasks:
-    - name: register power light locker setting
-      shell: gsettings get org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout
-      register: power
+    - name: no screen saver ... this is a VM
+      apt:
+        name: light-locker
+        state: absent
+    # This might not be necessary
+    - name: set up user ssh directory
+      file:
+        path: "/home/{{ vm_user }}/.ssh"
+        state: directory
+        mode: 0700
+        owner: "{{ vm_user }}"
+

@@ -66,3 +66,6 @@ d-i hw-detect/load_firmware boolean false
 d-i hw-detect/load_media boolean false
 apt-cdrom-setup apt-setup/cdrom/set-first boolean false
 tasksel tasksel/first multiselect
+d-i preseed/late_command string \
+    echo '$vm_user ALL=(ALL) NOPASSWD: ALL' > /target/etc/sudoers.d/$vm_user ; \
+    in-target chmod 440 /etc/sudoers.d/$vm_user ;

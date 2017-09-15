@@ -20,9 +20,8 @@ args = vars(parser.parse_args());
 
 ##### Quick check CLI Arguments
 if len(sys.argv) == 1:
-    print "Please use -h for usage"
-    print "Using defaults: --name devbox --codename xenial"
-    time.sleep(3)
+    subprocess.call(["python","bin/build.py","-h"])
+    sys.exit(0)
 
 md5command = ''
 md5sum = ''

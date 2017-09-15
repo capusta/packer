@@ -8,7 +8,7 @@
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "vm_name": "{{user `vm_name`}}",
-      "ssh_username": "vagrant",
+      "ssh_username": "{{user `vm_user`}}",
       "ssh_password": "vagrant",
       "ssh_wait_timeout": "200m",
       "disk_size": "50000",
@@ -49,8 +49,16 @@
   "provisioners": [
     {
       "type": "ansible",
-      "playbook_file": "./ansible/kickstart.yml",
-      "extra_arguments": ["--diff"]
+      "playbook_file": "ansible/kickstart.yml",
+      "extra_arguments": [
+        "--diff","--become","--become-user=root",
+        "--extra-vars","vm_user={{ user `vm_user` }}"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{ user `home_dir` }}/.ssh",
+      "destination": "/home/{{ user `vm_user` }}"
     },
     {
       "type": "shell",
