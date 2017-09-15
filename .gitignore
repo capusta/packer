@@ -20,7 +20,7 @@ wget-log.*
 
 # Vagrant
 .vagrant/
-Vagrantfile
+http/Vagrantfile
 
 # Folder stuff
 .idea/
@@ -33,3 +33,4 @@ packer_cache/
 *.box
 *.vdi
 *.retry
+build/

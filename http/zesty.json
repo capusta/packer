@@ -21,6 +21,7 @@
         ["modifyvm", "{{.Name}}", "--cpus", "2"],
         ["modifyvm", "{{.Name}}", "--hwvirtex", "on"],
         ["modifyvm", "{{.Name}}", "--nestedpaging", "on"],
+        ["modifyvm", "{{.Name}}", "--natpf1", "guestssh,tcp,,2223,,22"],
         ["modifyvm", "{{.Name}}", "--largepages", "on"]
       ],
       "http_directory": ".",
@@ -71,11 +72,11 @@
   ],
   "post-processors": [
     {
+      "type": "vagrant",
       "compression_level": "9",
-      "output": "build/{{user `box_basename`}}.{{.Provider}}.box",
+      "output": "build/{{user `vm_name`}}.{{.Provider}}.box",
       "keep_input_artifact": true,
-      "vagrantfile_template": "http/Vagrantfile",
-      "type": "vagrant"
+      "vagrantfile_template": "http/Vagrantfile"
     }
   ]
 }

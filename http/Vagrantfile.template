@@ -2,28 +2,27 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
+
+  config.vm.hostname = "$vm_name"
+
   # Network configuration
+  config.ssh.forward_agent = true  # Forward agents if you have the up and running on your host
+  #config.ssh.private_key_path = ["~/.ssh/id_rsa"] # Add your own key here if you'd like
+  #config.ssh.keys_only = false     # Do NOT use ONLY vagran's key
+  if File.exists?("~/.ssh")
+    config.vm.provision "file", source: "~/.ssh", destination: ".ssh"
+  end
+  config.ssh.private_key_path = "~/.ssh/id_rsa"
+
   config.vm.provider "virtualbox" do |vbox|
     vbox.memory = 2048
     vbox.cpus = 2
   end
 
-  config.vm.hostname = "devbox"
-
   # Shared configuration
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder ".", "/srv"
 
-  #config.ssh.forward_agent = true  # Forward agents if you have the up and running on your host
-  #config.ssh.private_key_path = ["~/.ssh/id_rsa"] # Add your own key here if you'd like
-  #config.ssh.keys_only = false     # Do NOT use ONLY vagran's key
-
-  if File.exists?("~/.ssh")
-    config.vm.provision "file", source: "~/.ssh", destination: ".ssh"
-  end
-
-  #config.vm.provision "file", source: "~/.ssh/known_hosts", destination: ".ssh/known_hosts"
-  #config.vm.provision "file", source: "~/.ssh/id_rsa", destination: ".ssh/id_rsa_user"
 
   $script = <<SCRIPT
   echo "using shell provisioner ... noop"
