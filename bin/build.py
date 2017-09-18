@@ -13,9 +13,10 @@ import subprocess
 import common
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-d","--download", nargs='?', help='Download the ISO based on the codename', default=False)
-parser.add_argument("--codename", nargs='?', help="Choose between xenial and trusty", default='xenial')
 parser.add_argument("--hostname", nargs=1,   help='VM Hostname, default is devbox', default=['devbox'])
+parser.add_argument("-d","--download", help='Download the ISO based on the codename', default=False)
+parser.add_argument("-c","--codename", nargs=1, help="Choose between xenial and zesty", default=['zesty'])
+parser.add_argument("-u","--user",     nargs=1, help="Primary VM user", default=['vagrant'])
 args = vars(parser.parse_args());
 
 ##### Quick check CLI Arguments
@@ -38,14 +39,19 @@ else:
 # JSON variable file is generated dynamically before packer validation
 # We will dump this variable to json var file
 SHARED_VARS = {}
+
 # Hostname is different all the time
 SHARED_VARS['vm_name'] = args['hostname'][0]
 SHARED_VARS['output_directory'] = 'build'
+SHARED_VARS['vm_user'] = args['user'][0]
+# Need to get the operator so we can copy over the ssh directory (if it exists)
+SHARED_VARS['home_dir'] = os.path.expanduser("~")
+SHARED_VARS['root_password'] = None
 
 # NO case in python :(
-CODENAME = args['codename']
+CODENAME = args['codename'][0]
 # Might use different codenames to use different builds
-SHARED_VARS['codename'] = CODENAME.strip()
+SHARED_VARS['codename'] = CODENAME
 
 if CODENAME == 'xenial':
     DWBASE = 'http://releases.ubuntu.com/16.04/'
@@ -90,13 +96,16 @@ ADD_PATH = os.getcwd()+'/bin:'
 MY_ENV = os.environ.copy()
 MY_ENV["PATH"] = ADD_PATH + MY_ENV["PATH"]
 
+from string import Template
+
 # -------------------------------------------------------
 # Generating var file in json format - consumed by packer
-
 VARFILE = 'http/vars'
 with open(VARFILE, 'w') as outfile:
     json.dump(SHARED_VARS, outfile)
 
+
+# Checking packer binaries
 PACKER_TEMPLATE = 'http/'+SHARED_VARS['codename']+'.json'
 MYPACKER = subprocess.check_output(['which', 'packer']).strip()
 common.log("Validating %s with %s " % (PACKER_TEMPLATE, MYPACKER))
