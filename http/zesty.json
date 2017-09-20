@@ -21,7 +21,6 @@
         ["modifyvm", "{{.Name}}", "--cpus", "2"],
         ["modifyvm", "{{.Name}}", "--hwvirtex", "on"],
         ["modifyvm", "{{.Name}}", "--nestedpaging", "on"],
-        ["modifyvm", "{{.Name}}", "--natpf1", "guestssh,tcp,,2223,,22"],
         ["modifyvm", "{{.Name}}", "--largepages", "on"]
       ],
       "http_directory": ".",
@@ -48,14 +47,6 @@
     }
   ],
   "provisioners": [
-    {
-      "type": "ansible",
-      "playbook_file": "ansible/kickstart.yml",
-      "extra_arguments": [
-        "--diff","--become","--become-user=root",
-        "--extra-vars","vm_user={{ user `vm_user` }}"
-      ]
-    },
     {
       "type": "file",
       "source": "{{ user `home_dir` }}/.ssh",

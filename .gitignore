@@ -1,6 +1,7 @@
 # Specifically Ignored for the build process
 http/vars
 http/zesty.ks
+*.retry
 
 # Random Binaries
 bin/packer
@@ -9,6 +10,7 @@ bin/packer
 *.swp
 *.tmp
 *.log
+*.log.*
 
 # Python Stuff
 *.pyc
@@ -21,6 +23,7 @@ wget-log.*
 # Vagrant
 .vagrant/
 http/Vagrantfile
+Vagrantfile
 
 # Folder stuff
 .idea/
@@ -32,5 +35,4 @@ packer_cache/
 *.ova
 *.box
 *.vdi
-*.retry
 build/

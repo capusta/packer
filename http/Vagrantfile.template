@@ -18,20 +18,32 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vbox|
     vbox.memory = 2048
     vbox.cpus = 2
+    vbox.customize ["modifyvm", :id, "--vram", "32"]
   end
 
   # Shared configuration
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder ".", "/srv"
 
-  # Provisioning
-  config.vm.provision "ansible_local" do |ansible|
-    ansible.playbook = "kickstart.yml"
-    ansible.install = true
-    ansible.provisioning_path = "/ansible"
-    ansible.inventory_path = "hosts"
-    ansible.limit = "all"
-    ansible.verbose = true
-    ansible.raw_arguments = "-c local"
-  end
+  $ansible_run = <<SCRIPT
+    set -e
+    # Set default name of the playbook, in case we dont have anything we have written ourselves
+    if [[ -z $ANSIBLE_PLAYBOOK ]]; then
+        # This is helpful if you want to symlink the playbook you want to enter
+        ANSIBLE_PLAYBOOK='entrypoint.yml'
+    fi
+    ANS_DIR=$(find /srv -name $ANSIBLE_PLAYBOOK | xargs -i dirname {})
+    if [[ -z $ANS_DIR ]]; then
+        echo "$ANSIBLE_PLAYBOOK not found"
+        exit 0
+    fi
+    cd $ANS_DIR
+    echo "ansible-playbook -i 'localhost,' $ANSIBLE_PLAYBOOK $ANSIBLE_EXTRA_ARGS"
+    ansible-playbook -i "localhost," $ANSIBLE_PLAYBOOK $ANSIBLE_EXTRA_ARGS
+
+    set -x
+    ansible-playbook -i "localhost," $ANSIBLE_PLAYBOOK $ANSIBLE_EXTRA_ARGS
+SCRIPT
+    config.vm.provision "shell", inline: $ansible_run,
+    env: {"ANSIBLE_PLAYBOOK" => ENV['ANSIBLE_PLAYBOOK'], 'ANSIBLE_EXTRA_ARGS' => ENV['ANSIBLE_EXTRA_ARGS']}
 end
