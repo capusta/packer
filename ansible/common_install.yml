@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: all
   connection: local
   tasks:
     - name: add apt repo for terminator
