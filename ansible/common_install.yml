@@ -1,13 +1,57 @@
 ---
 - hosts: all
-  connection: local
+  become: yes
   tasks:
+    # Repositories first
     - name: add apt repo for terminator
-      become: true
-      apt_repository:
-        repo: 'ppa:gnome-terminator/ppa'
-    - name: install terminator
-      become: true
-      apt:
-        name: terminator
-        state: present
+      apt_repository: repo={{ item }}
+      with_items:
+        - 'ppa:gnome-terminator/ppa'
+    # Purging second
+    - name: Purge unnecessary packages
+      apt: name={{ item }} state=absent purge=yes
+      with_items:
+        - light-locker
+        - audaicous
+        - pidgin
+        - abiword
+        - gnumeric
+        - transmission-gtk
+        - sylpheed
+        - gnome-player
+        - mpv
+    - name: install common packages
+      apt: name={{ item }} state=present cache_valid_time=3600
+      with_items:
+        - apt-transport-https
+        - git
+        - htop
+        - lsof
+        - rsync
+        - terminator
+        - tig
+        - tmux
+        - vim
+    - name: ssh | disallow root login
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '#PermitRootLogin.*$'
+        insertafter: '#PermitRootLogin.*$'
+        backrefs: yes
+        line: 'PermitRootLogin no'
+      # Common Kernel Tasks
+    - name: Autoremove suggests kernels to remove - Lets do it
+      args:
+        warn: false
+      shell: |
+        apt-get --dry-run autoremove | 
+        grep -E "^Remv linux-(headers|image)" | awk '{print $2}'
+      register: candidate_kernels
+      changed_when: "candidate_kernels.stdout_lines != []"
+
+      # Free up some space after upgrades
+    - name: Purge old kernels
+      apt: name={{item}} state=absent purge=yes
+      with_items: "{{ candidate_kernels.stdout_lines }}"
+      when: candidate_kernels.changed
+

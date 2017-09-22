@@ -1,0 +1,17 @@
+---
+- name: install lynis auditing
+  hosts: all
+  become: yes
+  tasks:
+    - name: install lynis
+      git:
+        repo: https://github.com/CISOfy/lynis
+        dest: /opt/lynis
+        version: 2.5.5
+    - name: install lynis cron job
+      cron:
+        name: lynis
+        user: root
+        cron_file: lynis
+        special_time: daily
+        job: 'cd /opt/lynis && ./lynis audit system --cronjob --quiet'
