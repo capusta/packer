@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: add apt repo for terminator
+      become: true
+      apt_repository:
+        repo: 'ppa:gnome-terminator/ppa'
+    - name: install terminator
+      become: true
+      apt:
+        name: terminator
+        state: present
