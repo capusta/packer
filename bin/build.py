@@ -9,6 +9,13 @@ import platform
 import json
 import subprocess
 
+# Modify the default template behavior so we can use % marks in our template
+# without having it clash with bash-native $ variable expansion
+import string
+class CustomTemplate(string.Template):
+    delimiter = '%'
+    idpattern = '[a-z0-9_]*'
+
 ##### Import relative files
 import common
 
@@ -96,14 +103,22 @@ ADD_PATH = os.getcwd()+'/bin:'
 MY_ENV = os.environ.copy()
 MY_ENV["PATH"] = ADD_PATH + MY_ENV["PATH"]
 
-from string import Template
-
 # -------------------------------------------------------
 # Generating var file in json format - consumed by packer
 VARFILE = 'http/vars'
 with open(VARFILE, 'w') as outfile:
     json.dump(SHARED_VARS, outfile)
 
+# -------------------------------------------------------
+
+# -------------------------------------------------------
+# Generating Vagrant file - consumed by packer
+VAGRANTFILE = 'http/Vagrantfile'
+src = CustomTemplate(open('http/Vagrantfile.template').read())
+result = src.substitute(SHARED_VARS)
+f = open('http/Vagrantfile','w')
+f.write(result)
+f.close
 
 # Checking packer binaries
 PACKER_TEMPLATE = 'http/'+SHARED_VARS['codename']+'.json'
