@@ -4,9 +4,10 @@
   tasks:
     # Repositories first
     - name: add apt repo for terminator
-      apt_repository: repo={{ item }}
-      with_items:
-        - 'ppa:gnome-terminator/ppa'
+      ignore_errors: yes
+      apt_repository:
+        repo: 'ppa:gnome-terminator/ppa'
+        codename: xenial  #zesty is not available yet
     # Purging second
     - name: Purge unnecessary packages
       apt: name={{ item }} state=absent purge=yes
@@ -32,6 +33,8 @@
         - tig
         - tmux
         - vim
+        - gpg-agent
+        - gnupg-agent
     - name: ssh | disallow root login
       lineinfile:
         dest: /etc/ssh/sshd_config

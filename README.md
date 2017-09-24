@@ -1,15 +1,29 @@
 [![Build Status](https://travis-ci.org/capusta/packer.svg?branch=master)](https://travis-ci.org/capusta/packer)
 
-Run ./build -n hostname --os (ubuntu|centos)
+`bin/build.py --hostname hostname --os (ubuntu|centos) --codename zesty -u user`
+
+For help:
+
+`./bin/build.py`
 
 ##### Download the intial images
-Ensure you have access to the internet:
-```./bin/build.py --download --codename xenial```
+Ensure access to the internet:
+```./bin/build.py --download --codename zesty```
 
 ##### Building Images
-``` ./bin/build.py --codename xenial```
+``` ./bin/build.py --codename zesty --hostname myVM -u myuser```
 
-This is [Ubuntu](http://www.ubuntu.com/) [16.04 LTS](https://wiki.ubuntu.com/XenialXerus/ReleaseNotes) 64-bit server with [LXDE](http://lxde.org/) desktop ([lubuntu-desktop](http://packages.ubuntu.com/xenial/lubuntu-desktop)). 
+[Ubuntu](http://www.ubuntu.com/) [16.04 LTS](https://wiki.ubuntu.com/XenialXerus/ReleaseNotes) 64-bit server with [LXDE](http://lxde.org/) desktop ([lubuntu-desktop](http://packages.ubuntu.com/xenial/lubuntu-desktop)). 
+
+
+###### Customizing with Ansible
+```bash
+export ANSIBLE_PLAYBOOK='kickstart.yml';
+export ANSIBLE_EXTRA_ARGS='-Dvv -c local' &&
+vagrant provision
+```
+Vagrant is going to try to find the $ANSIBLE_PLAYBOOK file in the current directory, if defined.  Default file is 
+`entrypoint.yml` 
 
 Resources
 ---------

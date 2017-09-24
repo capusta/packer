@@ -1,19 +1,18 @@
 ---
 - name: Customizations
   hosts: all
-  become: yes
-  when: ansible_distribution == "Ubuntu"
   tasks:
-    - name: 'Install Python PIP'
-        become: 'yes'
-        apt: >
-          name=python-pip
-          state=latest
+    - name: Install Python PIP
+      become: yes
+      when: ansible_distribution == "Ubuntu"
+      apt: >
+        name=python-pip
+        state=latest
 
-    - name: 'Install AWS CLI and supporting libraries'
-        become: 'yes'
-        pip: name={{ item }} state=latest
-        with_items:
-          - awscli
-          - boto3
-          - boto
+    - name: Install AWS CLI and supporting libraries
+      become: yes
+      pip: name={{ item }} state=latest
+      with_items:
+        - awscli
+        - boto3
+        - boto
