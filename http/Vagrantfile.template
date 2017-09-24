@@ -3,12 +3,12 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.hostname = "$vm_name"
+  config.vm.hostname = "%vm_name"
 
   # Forward agents if you have the up and running on your host
   config.ssh.forward_agent = true
   config.ssh.private_key_path = ["~/.ssh/id_rsa"] # Add your own key here if you'd like
-  config.ssh.username = "$vm_user"
+  config.ssh.username = "%vm_user"
 
   #config.ssh.keys_only = false     # Do NOT use ONLY vagran's key
   if File.exists?("~/.ssh")
@@ -38,11 +38,9 @@ Vagrant.configure("2") do |config|
         exit 0
     fi
     cd $ANS_DIR
-    echo "ansible-playbook -i 'localhost,' $ANSIBLE_PLAYBOOK $ANSIBLE_EXTRA_ARGS"
+    PYTHONUNBUFFERED=1 ANSIBLE_FORCE_COLOR=true \
     ansible-playbook -i "localhost," $ANSIBLE_PLAYBOOK $ANSIBLE_EXTRA_ARGS
-
-    set -x
-    ansible-playbook -i "localhost," $ANSIBLE_PLAYBOOK $ANSIBLE_EXTRA_ARGS
+    su %vm_user -c "ansible-playbook -i 'localhost,' $ANSIBLE_PLAYBOOK $ANSIBLE_EXTRA_ARGS"
 SCRIPT
     config.vm.provision "shell", inline: $ansible_run,
     env: {"ANSIBLE_PLAYBOOK" => ENV['ANSIBLE_PLAYBOOK'], 'ANSIBLE_EXTRA_ARGS' => ENV['ANSIBLE_EXTRA_ARGS']}

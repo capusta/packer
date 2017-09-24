@@ -110,6 +110,13 @@ with open(VARFILE, 'w') as outfile:
     json.dump(SHARED_VARS, outfile)
 
 # -------------------------------------------------------
+# Generating preseed file - consumed by packer
+PRESEED_FILE = 'http/'+CODENAME+'.ks'
+src = CustomTemplate( open('http/'+CODENAME+'.template.ks').read() )
+result = src.substitute(SHARED_VARS)
+f = open('http/'+CODENAME+'.ks','w')
+f.write(result)
+f.close
 
 # -------------------------------------------------------
 # Generating Vagrant file - consumed by packer

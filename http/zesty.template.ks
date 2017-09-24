@@ -47,8 +47,8 @@ d-i partman/confirm_write_new_label boolean true
 
 # User Creation
 d-i passwd/user-uid string 900
-d-i passwd/user-fullname string $vm_user
-d-i passwd/username string $vm_user
+d-i passwd/user-fullname string %vm_user
+d-i passwd/username string %vm_user
 d-i passwd/user-password password vagrant
 d-i passwd/user-password-again password vagrant
 d-i passwd/auto-login boolean true
@@ -67,5 +67,5 @@ d-i hw-detect/load_media boolean false
 apt-cdrom-setup apt-setup/cdrom/set-first boolean false
 tasksel tasksel/first multiselect
 d-i preseed/late_command string \
-    echo '$vm_user ALL=(ALL) NOPASSWD: ALL' > /target/etc/sudoers.d/$vm_user ; \
-    in-target chmod 440 /etc/sudoers.d/$vm_user ;
+    echo '%vm_user ALL=(ALL) NOPASSWD: ALL' > /target/etc/sudoers.d/%vm_user ; \
+    in-target chmod 440 /etc/sudoers.d/%vm_user ;
