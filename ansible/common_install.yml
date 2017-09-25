@@ -47,7 +47,7 @@
       args:
         warn: false
       shell: |
-        apt-get --dry-run autoremove | 
+        apt-get --dry-run autoremove |
         grep -E "^Remv linux-(headers|image)" | awk '{print $2}'
       register: candidate_kernels
       changed_when: "candidate_kernels.stdout_lines != []"
@@ -57,4 +57,3 @@
       apt: name={{item}} state=absent purge=yes
       with_items: "{{ candidate_kernels.stdout_lines }}"
       when: candidate_kernels.changed
-
