@@ -1,0 +1,16 @@
+---
+- name: Install the Atom text editor
+  hosts: all
+  vars:
+    atom_version: 1.20.1
+  tasks:
+    - name: check the current version of atom
+      command: dpkg-query -W atom
+      register: atom_check_deb
+      changed_when: atom_check_deb.rc == 1 or '{{ atom_version }}' not in atom_check_deb.stdout
+    - name: Install atom deb
+      become: yes
+      when: atom_check_deb|changed
+      apt: 
+        deb: "https://github.com/atom/atom/releases/download/v{{ atom_version }}/atom-amd64.deb"
+
