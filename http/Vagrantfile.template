@@ -10,9 +10,14 @@ Vagrant.configure("2") do |config|
   config.ssh.private_key_path = ["~/.ssh/id_rsa"] # Add your own key here if you'd like
   config.ssh.username = "%vm_user"
 
-  #config.ssh.keys_only = false     # Do NOT use ONLY vagran's key
   if File.exists?("~/.ssh")
     config.vm.provision "file", source: "~/.ssh", destination: ".ssh"
+  end
+  if File.exists?("~/.aws")
+    config.vm.provision "file", source: "~/.aws", destination: ".aws"
+  end
+  if File.exists?("~/.gnupg")
+    config.vm.provision "file", source: "~/.gnupg", destination: ".gnupg"
   end
 
   config.vm.provider "virtualbox" do |vbox|
