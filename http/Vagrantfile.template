@@ -7,6 +7,7 @@ Vagrant.configure("2") do |config|
 
   # Forward agents if you have the up and running on your host
   config.ssh.forward_agent = true
+  #config.vm.network "forwarded_port", guest: 22, host: 2731, id: "ssh", auto_correct: true
   config.ssh.private_key_path = ["~/.ssh/id_rsa"] # Add your own key here if you'd like
   config.ssh.username = "%vm_user"
 

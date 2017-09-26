@@ -1,4 +1,15 @@
 ---
-- name: starting peronalizations
-  debug:
-    msg: "placeholder"
+- name: personalize home directory for a user
+  hosts: all
+  tasks:
+    - name: set the home directory
+      set_fact:
+        home: "{{ lookup('env','HOME') }}"
+    - name: configure local aliases
+      template:
+        dest: "{{ home }}/.bash_aliases"
+        src: "template.bash_aliases"
+    - name: configure bashrc.local
+      template:
+        dest: "{{ home }}/.bashrc.local"
+        src: "template.bashrc.local"
