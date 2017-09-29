@@ -34,7 +34,7 @@
         - tmux
         - vim
         - gpg-agent
-        - gnupg-agent
+        - gnupg
     - name: ssh | disallow root login
       lineinfile:
         dest: /etc/ssh/sshd_config
@@ -42,7 +42,7 @@
         insertafter: '#PermitRootLogin.*$'
         backrefs: yes
         line: 'PermitRootLogin no'
-      # Common Kernel Tasks
+      # Common Kernel Task
     - name: Autoremove suggests kernels to remove - Lets do it
       args:
         warn: false

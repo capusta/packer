@@ -1,18 +1,19 @@
 ---
 - name: Customizations
   hosts: all
+  become: yes
   tasks:
-    - name: Install Python PIP
-      become: yes
-      when: ansible_distribution == "Ubuntu"
-      apt: >
-        name=python-pip
-        state=latest
-
-    - name: Install AWS CLI and supporting libraries
-      become: yes
-      pip: name={{ item }} state=latest
-      with_items:
-        - awscli
-        - boto3
-        - boto
+    - name: download the bundle installer for awscli tools (ubuntu deb is too old)
+      get_url:
+        url: https://s3.amazonaws.com/aws-cli/awscli-bundle.zip
+        dest: /opt/awscli-bundle.zip
+        mode: 0640
+    - name: unzip the file
+      command: unzip -o awscli-bundle.zip
+      args:
+        chdir: /opt
+        creates: /opt/awscli-bundle
+    - name: Install awsclitools
+      shell: /opt/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+      args:
+        creates: /usr/local/aws
