@@ -5,6 +5,22 @@
     - name: set the home directory
       set_fact:
         home: "{{ lookup('env','HOME') }}"
+    - name: set to source bashrc_local
+      lineinfile:
+        dest: "{{ home }}/.bashrc"
+        line: "source .bashrc.local"
+        insertbefore: '^# enable programmable completion'
+    - name: set to flush history after every command
+      lineinfile:
+        dest: "{{ home }}/.bashrc"
+        line: "PROMPT_COMMAND='history -a;history -n'"
+        insertafter: '^shopt -s histappend'
+    - name: create config dir
+      file: state=directory path="{{ home }}/.config/terminator" recurse=yes
+    - name: configure terminator template
+      template:
+        dest: "{{ home }}/.config/terminator/config"
+        src: "template.terminator"
     - name: configure local aliases
       template:
         dest: "{{ home }}/.bash_aliases"
