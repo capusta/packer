@@ -29,3 +29,19 @@
       template:
         dest: "{{ home }}/.bashrc.local"
         src: "template.bashrc.local"
+    - name: install sexy bash prompt
+      become: yes
+      git:
+        repo: https://github.com/twolfson/sexy-bash-prompt
+        depth: 1
+        dest: /opt/sexy-bash
+    - name: install sexy bash prompt
+      shell: make install
+      args:
+        chdir: /opt/sexy-bash
+        creates: "{{ home }}/.bash_prompt"
+    - name: force install the latest sexy bash prompt
+      when: force is defined
+      shell: make install
+      args:
+        chdir: /opt/sexy-bash
