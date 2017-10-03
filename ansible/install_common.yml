@@ -32,6 +32,7 @@
         - terminator
         - tig
         - tmux
+        - ntp
         - vim
         - gpg-agent
         - gnupg
@@ -51,7 +52,10 @@
         grep -E "^Remv linux-(headers|image)" | awk '{print $2}'
       register: candidate_kernels
       changed_when: "candidate_kernels.stdout_lines != []"
-
+    - name: start services running
+      service: name={{ item }} state=started enabled=yes
+      with_items:
+        - ntp
       # Free up some space after upgrades
     - name: Purge old kernels
       apt: name={{item}} state=absent purge=yes
