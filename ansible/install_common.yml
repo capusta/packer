@@ -26,6 +26,7 @@
       with_items:
         - apt-transport-https
         - git
+        - dnsutils
         - htop
         - lsof
         - rsync
