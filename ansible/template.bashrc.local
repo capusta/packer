@@ -6,7 +6,7 @@ if test -f $HOME/.gpg-agent-info && \
     GPG_AGENT_INFO=`cat $HOME/.gpg-agent-info | cut -c 16-`
 else
     # No, gpg-agent not available; start gpg-agent
-    eval `gpg-agent --daemon --no-grb ` > /dev/null
+    eval `gpg-agent --daemon --no-grab ` > /dev/null
 fi
 export GPG_TTY=`tty`
 export GPG_AGENT_INFO
