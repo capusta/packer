@@ -1,0 +1,23 @@
+---
+- name: install docker on ubuntu
+  hosts: all
+  vars:
+    # We'll controll the CE version of docker here
+    docker_ce: 17.06.2~ce-0~ubuntu
+  tasks:
+    - name: Register fact -> uname-r
+      shell: uname -r
+      register: this_kernel
+    - name: Register fact -> docker apt key
+      shell: apt-key list | grep 'docker@docker'
+      register: docker_apt_key
+      ignore_errors: yes
+    - name: install ubuntu docker apt key
+      become: yes
+      shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+      when: "(not ansible_check_mode) and ('docker@docker' not in docker_apt_key.stdout)"
+    - name: add apt repository
+      become: yes
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
