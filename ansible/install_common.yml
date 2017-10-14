@@ -28,12 +28,14 @@
         - git
         - dnsutils
         - htop
+        - ca-certificates
         - lsof
         - rsync
         - terminator
         - tig
         - tmux
         - ntp
+- man
         - vim
         - gpg-agent
         - gnupg

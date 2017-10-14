@@ -21,3 +21,28 @@
       apt_repository:
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
         state: present
+    - name: install additional goodies for docker support
+      become: yes
+      apt: name={{ item }} state=present cache_valid_time=3600
+      when: not ansible_check_mode
+      with_items:
+        - linux-image-extra-{{ this_kernel.stdout }}
+        - linux-image-extra-virtual
+        - software-properties-common
+        - docker-ce={{ docker_ce }}
+    - name: get current user
+      local_action: command whoami
+      register: username_on_host
+    - name: add docker to user groups
+      become: yes
+      user:
+        name: "{{ username_on_host.stdout }}"
+        groups: docker
+        append: yes
+        state: present
+    - name: enable upstart docker
+      become: yes
+      service:
+        name: docker
+        enabled: yes
+        state: started
