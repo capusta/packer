@@ -35,7 +35,8 @@
         - tig
         - tmux
         - ntp
-- man
+        - man
+        - rng-tools
         - vim
         - gpg-agent
         - gnupg
