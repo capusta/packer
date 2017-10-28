@@ -1,6 +1,7 @@
 ---
 - name: personalize home directory for a user
-  hosts: all
+  hosts: localhost
+  connection: local
   tasks:
     - name: set the home directory
       set_fact:
