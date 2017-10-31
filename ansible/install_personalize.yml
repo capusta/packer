@@ -46,3 +46,8 @@
       shell: make install
       args:
         chdir: /opt/sexy-bash
+    - name: configure vimrc
+      template:
+        dest: "{{ home }}/.vimrc"
+        src: "template.vimrc.local"
+
