@@ -50,4 +50,8 @@
       template:
         dest: "{{ home }}/.vimrc"
         src: "template.vimrc.local"
+    - name: configure tmux
+      template:
+        dest: "{{ home }}/.tmux.conf"
+        src: "template.tmux"
 
