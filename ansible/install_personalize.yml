@@ -54,4 +54,13 @@
       template:
         dest: "{{ home }}/.tmux.conf"
         src: "template.tmux"
+    - name: create home bin folder
+      file:
+        path: "{{ home }}/bin"
+        state: directory
+    - name: configure tmux helper
+      template:
+        mode: 0754
+        dest: "{{ home }}/bin/mm"
+        src: "template.mm"
 

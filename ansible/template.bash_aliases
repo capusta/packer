@@ -10,3 +10,4 @@ alias dps='docker ps --format "table {{.Names}}\t{{.Status}}"'
 {% endraw %}
 
 alias drm='docker ps -a | grep Exit | cut -d " " -f 1 | xargs docker rm'
+alias mm='~/bin/mm'
