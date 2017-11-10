@@ -8,7 +8,6 @@ set -g pane-active-border-fg brightred
 
 ## Status bar design
 # status line
-set -g status-utf8 on
 set -g status-justify left
 set -g status-bg default
 set -g status-fg colour12
@@ -45,6 +44,7 @@ set-option -g visual-bell off
 set-option -g visual-silence off
 set-window-option -g monitor-activity off
 set-option -g bell-action none
+set-option -g default-shell "/bin/bash"
 
 set -g default-terminal "screen-256color"
 
