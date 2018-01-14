@@ -11,4 +11,5 @@ fi
 export GPG_TTY=`tty`
 export GPG_AGENT_INFO
 
-[[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
+export GOROOT=/usr/local/go
+export PATH=$GOROOT/bin:$PATH
